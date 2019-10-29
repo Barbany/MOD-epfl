@@ -8,6 +8,9 @@
 \usepackage{booktabs}
 \usepackage[T1]{fontenc}
 
+\usepackage{graphicx}
+\usepackage{epstopdf}
+
 % Bold vectors and matrices
 \renewcommand{\aa}{\mathbf{a}}
 \providecommand{\xx}{\mathbf{x}}
@@ -165,5 +168,19 @@
     \end{align}
     
 \end{enumerate}
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.4]{Figure_1}
+    \caption{Caption}
+    \label{fig:my_label}
+\end{figure}
+
+\begin{itemize}
+    \item Why do the algorithms in second graph start at different times?
+    \item Emphasize Nesterov ripples and similarity of restart version until the first ripple.
+    \item Compare algorithms also for the hyperparameters they use
+    \item Can also do time analysis for first graph and iterations for second
+\end{itemize}
 
 \end{document}
