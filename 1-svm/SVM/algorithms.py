@@ -242,14 +242,11 @@ def LSGD(fx, gradf, parameter):
         
         # Compute local smoothness
         L = 0.5 * L
-        unsatisfied = True
         i = 0
-        while(unsatisfied):
-            if fx(x + d / (2**i * L)) > fx(x) - (d.T @ d) / (2**(i + 1) * L):
-                i += 1
-            else:
-                unsatisfied = False
-                L = 2**i * L
+        while fx(x + d / (2**i * L)) > fx(x) - (d.T @ d) / (2**(i + 1) * L):
+            i += 1
+                
+        L = 2**i * L
 
         # Perform actual Gradient Descent step
         x_next = x + d / L
@@ -315,7 +312,7 @@ def LSAGD(fx, gradf, parameter):
 
         # Perform actual Accelerated Gradient Descent step
         x_next = y + d / L
-        t_next = 0.5 * (1 + np.sqrt(1 + 4 * (L / parameter['Lips']) * t**2))
+        t_next = 0.5 * (1 + np.sqrt(1 + 4 * 2**(i-1) * t**2))
         y = x_next + (t - 1) / t_next * (x_next - x)
 
         # Compute error and save data to be plotted later on.
@@ -420,7 +417,6 @@ def LSAGDR(fx, gradf, parameter):
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # This variable is true if we restarted in the last iteration (reuse alpha from LS)
-    restart = False
 
     # Main loop.
     for iter in range(maxit):
@@ -431,20 +427,13 @@ def LSAGDR(fx, gradf, parameter):
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
         # TODO: Review
         # Compute local smoothness
-        if restart:
-            restart = False
-            # Don't modify L (same as previous iteration since y is not modified when we restart)
-        else:
-            d = - gradf(y)
-            L = 0.5 * L
-            unsatisfied = True
-            i = 0
-            while(unsatisfied):
-                if fx(y + d / (2**i * L)) > fx(y) - (d.T @ d) / (2**(i + 1) * L):
-                    i = i + 1
-                else:
-                    unsatisfied = False
-                    L *= 2**i
+        d = - gradf(y)
+        L *= 0.5
+        i = 0
+        while fx(y + d / (2**i * L)) > fx(y) - (d.T @ d) / (2**(i + 1) * L):
+            i = i + 1
+        
+        L *= 2**i
 
         # Perform actual Accelerated Gradient Descent step
         x_next = y + d / L
@@ -453,9 +442,8 @@ def LSAGDR(fx, gradf, parameter):
         if fx(x) < fx(x_next):
             x_next = x - gradf(x) / L
             t = 1
-            restart = True
             
-        t_next = 0.5 * (1 + np.sqrt(1 + 4 * 2**i * t**2))
+        t_next = 0.5 * (1 + np.sqrt(1 + 4 * 2**(i-1) * t**2))
         y = x_next + (t - 1) / t_next * (x_next - x)
 
         # Compute error and save data to be plotted later on.
@@ -719,7 +707,7 @@ def SVR(fx, gradf, gradfsto, parameter):
         for _ in range(q):
             # Pick i u.a.r.
             i = np.random.randint(parameter['no0functions'])
-            x_tilde -= gamma * (gradfsto(x_tilde, i) - gradfsto(x, i) + v_k)
+            x_tilde = x_tilde - gamma * (gradfsto(x_tilde, i) - gradfsto(x, i) + v_k)
             x_next += x_tilde / q
 
         # Compute error and save data to be plotted later on.
