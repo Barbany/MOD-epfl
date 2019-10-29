@@ -5,6 +5,7 @@ def fsmoothedhinge(A,b,x):
     fx = np.zeros(A.shape[0])
     for i in range(A.shape[0]):
         ci = b[i]*np.dot(A[i],x)
+
         if ci <= 0:
             fx[i] = 0.5 - ci
         elif ci <= 1:

@@ -4,6 +4,7 @@ import scipy.sparse.linalg as spla
 from numpy.random import randint
 from scipy.sparse.linalg.dsolve import linsolve
 
+
 def GD(fx, gradf, parameter):
     """
     Function:  [x, info] = GD(fx, gradf, parameter)
@@ -17,12 +18,14 @@ def GD(fx, gradf, parameter):
     :param parameter:
     :return:
     """
-    print(68*'*')
+    print(68 * '*')
     print('Gradient Descent')
 
     # Initialize x and alpha.
-    #### YOUR CODES HERE
-
+    x = parameter['x0']
+    alpha = 1 / parameter['Lips']
+    
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -32,15 +35,14 @@ def GD(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        x_next = x - alpha * gradf(x)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.time() - tic
         info['fx'][iter] = fx(x)
 
         # Print the information.
-        if (iter %  5 ==0) or (iter == 0):
+        if (iter % 5 == 0) or (iter == 0):
             print('Iter = {:4d},  f(x) = {:0.9f}'.format(iter, info['fx'][iter]))
 
         # Prepare the next iteration
@@ -50,7 +52,7 @@ def GD(fx, gradf, parameter):
 
 
 # gradient with strong convexity
-def GDstr(fx, gradf, parameter) :
+def GDstr(fx, gradf, parameter):
     """
     Function:  GDstr(fx, gradf, parameter)
     Purpose:   Implementation of the gradient descent algorithm.
@@ -64,12 +66,14 @@ def GDstr(fx, gradf, parameter) :
     :return: x, info
     """
 
-    print(68*'*')
+    print(68 * '*')
     print('Gradient Descent  with strong convexity')
 
     # Initialize x and alpha.
-    #### YOUR CODES HERE
+    x = parameter['x0']
+    alpha = 2 / (parameter['Lips'] + parameter['strcnvx'])
 
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -79,8 +83,7 @@ def GDstr(fx, gradf, parameter) :
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        x_next = x - alpha * gradf(x)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
@@ -94,6 +97,7 @@ def GDstr(fx, gradf, parameter) :
         x = x_next
 
     return x, info
+
 
 # accelerated gradient
 def AGD(fx, gradf, parameter):
@@ -115,8 +119,11 @@ def AGD(fx, gradf, parameter):
     print('Accelerated Gradient')
 
     # Initialize x, y and t.
-    #### YOUR CODES HERE
-
+    x = parameter['x0']
+    y = parameter['x0']
+    t = 1
+    
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -127,8 +134,9 @@ def AGD(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        x_next = y - gradf(y) / parameter['Lips']
+        t_next = 0.5 * (1 + np.sqrt(1 + 4 * t**2))
+        y = x_next + (t - 1) / t_next * (x_next - x)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
@@ -138,12 +146,12 @@ def AGD(fx, gradf, parameter):
         if (iter % 5 == 0) or (iter == 0):
             print('Iter = {:4d},  f(x) = {:0.9f}'.format(iter, info['fx'][iter]))
 
-
         # Prepare next iteration
         x = x_next
         t = t_next
 
     return x, info
+
 
 # accelerated gradient with strong convexity
 def AGDstr(fx, gradf, parameter):
@@ -164,9 +172,15 @@ def AGDstr(fx, gradf, parameter):
     print(68 * '*')
     print('Accelerated Gradient with strong convexity')
 
-    # Initialize x, y and t.
-    #### YOUR CODES HERE
+    # Initialize x and y.
+    x = parameter['x0']
+    y = parameter['x0']
 
+    # Smoothness and strong convexity
+    L = parameter['Lips']
+    mu = parameter['strcnvx']
+
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -177,8 +191,8 @@ def AGDstr(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-
-        #### YOUR CODES HERE
+        x_next = y - gradf(y) / L
+        y = x_next + (np.sqrt(L) - np.sqrt(mu)) / (np.sqrt(L) + np.sqrt(mu)) * (x_next - x)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
@@ -188,11 +202,11 @@ def AGDstr(fx, gradf, parameter):
         if (iter % 5 == 0) or (iter == 0):
             print('Iter = {:4d},  f(x) = {:0.9f}'.format(iter, info['fx'][iter]))
 
-
         # Prepare next iteration
         x = x_next
 
     return x, info
+
 
 # LSGD
 def LSGD(fx, gradf, parameter):
@@ -211,9 +225,11 @@ def LSGD(fx, gradf, parameter):
     print(68 * '*')
     print('Gradient Descent with line search')
 
-    # Initialize x, y and t.
-    #### YOUR CODES HERE
+    # Initialize x and L.
+    x = parameter['x0']
+    L = parameter['Lips']
 
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -222,8 +238,21 @@ def LSGD(fx, gradf, parameter):
         tic = time.clock()
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
+        d = - gradf(x)
         
-        #### YOUR CODES HERE
+        # Compute local smoothness
+        L = 0.5 * L
+        unsatisfied = True
+        i = 0
+        while(unsatisfied):
+            if fx(x + d / (2**i * L)) > fx(x) - (d.T @ d) / (2**(i + 1) * L):
+                i += 1
+            else:
+                unsatisfied = False
+                L = 2**i * L
+
+        # Perform actual Gradient Descent step
+        x_next = x + d / L
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
@@ -237,6 +266,7 @@ def LSGD(fx, gradf, parameter):
         x = x_next
 
     return x, info
+
 
 # LSAGD
 def LSAGD(fx, gradf, parameter):
@@ -256,8 +286,14 @@ def LSAGD(fx, gradf, parameter):
     print('Accelerated Gradient with line search')
 
     # Initialize x, y and t.
-    #### YOUR CODES HERE
+    x = parameter['x0']
+    y = parameter['x0']
+    t = 1
 
+    # Initialize L to Lipschitz constant of the gradients
+    L = parameter['Lips']
+
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -267,8 +303,20 @@ def LSAGD(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
+        d = - gradf(y)
         
-        #### YOUR CODES HERE
+        # Compute local smoothness
+        L *= 0.5
+        i = 0
+        while fx(y + d / (2**i * L)) > fx(y) - (d.T @ d) / (2**(i + 1) * L):
+            i = i + 1
+        
+        L *= 2**i
+
+        # Perform actual Accelerated Gradient Descent step
+        x_next = y + d / L
+        t_next = 0.5 * (1 + np.sqrt(1 + 4 * (L / parameter['Lips']) * t**2))
+        y = x_next + (t - 1) / t_next * (x_next - x)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
@@ -303,8 +351,11 @@ def AGDR(fx, gradf, parameter):
     print('Accelerated Gradient with restart')
 
     # Initialize x, y, t and find the initial function value (fval).
-    #### YOUR CODES HERE
+    x = parameter['x0']
+    y = parameter['x0']
+    t = 1
 
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -314,9 +365,17 @@ def AGDR(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
+        x_next = y - gradf(y) / parameter['Lips']
         
-        #### YOUR CODES HERE
+        # Check if we restart
+        if fx(x) < fx(x_next):
+            y = x
+            x_next = x - gradf(y) / parameter['Lips']
+            t = 1
 
+        t_next = 0.5 * (1 + np.sqrt(1 + 4 * t**2))
+        y = x_next + (t - 1) / t_next * (x_next - x)
+        
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
         info['fx'][iter] = fx(x)
@@ -350,9 +409,18 @@ def LSAGDR(fx, gradf, parameter):
     print('Accelerated Gradient with line search + restart')
 
     # Initialize x, y, t and find the initial function value (fval).
-    #### YOUR CODES HERE
+    x = parameter['x0']
+    y = parameter['x0']
+    t = 1
+    
+    # Initialize L to Lipschitz constant of the gradients
+    L = parameter['Lips']
 
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
+
+    # This variable is true if we restarted in the last iteration (reuse alpha from LS)
+    restart = False
 
     # Main loop.
     for iter in range(maxit):
@@ -361,8 +429,34 @@ def LSAGDR(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        # TODO: Review
+        # Compute local smoothness
+        if restart:
+            restart = False
+            # Don't modify L (same as previous iteration since y is not modified when we restart)
+        else:
+            d = - gradf(y)
+            L = 0.5 * L
+            unsatisfied = True
+            i = 0
+            while(unsatisfied):
+                if fx(y + d / (2**i * L)) > fx(y) - (d.T @ d) / (2**(i + 1) * L):
+                    i = i + 1
+                else:
+                    unsatisfied = False
+                    L *= 2**i
+
+        # Perform actual Accelerated Gradient Descent step
+        x_next = y + d / L
+            
+        # Check if we restart
+        if fx(x) < fx(x_next):
+            x_next = x - gradf(x) / L
+            t = 1
+            restart = True
+            
+        t_next = 0.5 * (1 + np.sqrt(1 + 4 * 2**i * t**2))
+        y = x_next + (t - 1) / t_next * (x_next - x)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
@@ -375,8 +469,10 @@ def LSAGDR(fx, gradf, parameter):
         # Prepare the next iteration
         x = x_next
         t = t_next
+        fval = fx(x)
 
     return x, info
+
 
 def AdaGrad(fx, gradf, parameter):
     """
@@ -393,10 +489,14 @@ def AdaGrad(fx, gradf, parameter):
     """
     print(68 * '*')
     print('Adaptive Gradient method')
-    
-    # Initialize x, alpha, delta (and any other)
-    #### YOUR CODES HERE
 
+    # Initialize x, alpha, delta (and any other)
+    x = parameter['x0']
+    alpha = 1
+    delta = 1e-5
+    q = 0
+
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -406,8 +506,9 @@ def AdaGrad(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        d = gradf(x)
+        q = q + d.T @ d
+        x_next = x - alpha / (np.sqrt(q) + delta) * d
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.clock() - tic
@@ -422,6 +523,7 @@ def AdaGrad(fx, gradf, parameter):
 
     return x, info
 
+
 # Newton
 def ADAM(fx, gradf, parameter):
     """
@@ -433,19 +535,24 @@ def ADAM(fx, gradf, parameter):
            strcnvx    - Strong convexity parameter of f(x).
     :param fx:
     :param gradf:
-    :param hessf:
     :param parameter:
     :return:
     """
 
     print(68 * '*')
     print('ADAM')
-    
-    # Initialize x, beta1, beta2, alphs, epsilon (and any other)
-    #### YOUR CODES HERE
 
+    # Initialize x, beta1, beta2, alpha, epsilon (and any other)
+    x = parameter['x0']
+    beta1 = 0.9
+    beta2 = 0.999
+    alpha = 0.1
+    epsilon = 1e-8
+    m = np.zeros(x.shape[0])
+    v = np.zeros(x.shape[0])
+
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
-
 
     # Main loop.
     for iter in range(maxit):
@@ -453,8 +560,10 @@ def ADAM(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        g = gradf(x)
+        m = beta1 * m + (1 - beta1) * g
+        v = beta2 * v + (1 - beta2) * g * g
+        x_next = x - alpha * (m / (1 - beta1)) / (np.sqrt(v / (1 - beta2)) + epsilon)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.time() - tic
@@ -469,6 +578,7 @@ def ADAM(fx, gradf, parameter):
 
     return x, info
 
+
 def SGD(fx, gradf, parameter):
     """
     Function:  [x, info] = GD(fx, gradf, parameter)
@@ -482,14 +592,14 @@ def SGD(fx, gradf, parameter):
     :param parameter:
     :return:
     """
-    print(68*'*')
+    print(68 * '*')
     print('Stochastic Gradient Descent')
 
     # Initialize x and alpha.
-    #### YOUR CODES HERE
+    x = parameter['x0']
 
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
-
 
     # Main loop.
 
@@ -498,8 +608,9 @@ def SGD(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        # Pick i u.a.r
+        i = np.random.randint(parameter['no0functions']) 
+        x_next = x - gradf(x, i) / (iter + 1)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.time() - tic
@@ -528,13 +639,19 @@ def SAG(fx, gradf, parameter):
     :param parameter:
     :return:
     """
-    print(68*'*')
+    print(68 * '*')
     print('Stochastic Gradient Descent with averaging')
 
-    # Initialize x and alpha.
-    #### YOUR CODES HERE
+    # Define dimension n
+    n = parameter['no0functions']
 
+    # Initialize x, alpha, v and sum of v.
+    x = parameter['x0']
+    alpha = 1 / (16 * parameter['Lmax'])
+    v = np.zeros((n, len(x)))
+    avg_v = np.zeros(len(x))
 
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
     # Main loop.
 
@@ -543,8 +660,13 @@ def SAG(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        # Pick i u.a.r
+        i = np.random.randint(n)
+        x_next = x - avg_v * alpha
+        # Update v
+        avg_v -= v[i] / n
+        v[i] = gradf(x, i)
+        avg_v += v[i] / n
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.time() - tic
@@ -559,6 +681,7 @@ def SAG(fx, gradf, parameter):
 
     return x, info
 
+
 def SVR(fx, gradf, gradfsto, parameter):
     """
     Function:  [x, info] = GD(fx, gradf, parameter)
@@ -572,12 +695,15 @@ def SVR(fx, gradf, gradfsto, parameter):
     :param parameter:
     :return:
     """
-    print(68*'*')
+    print(68 * '*')
     print('Stochastic Gradient Descent with variance reduction')
 
-    # Initialize x and alpha.
-    #### YOUR CODES HERE
+    # Initialize x, q and gamma.
+    x = parameter['x0']
+    q = int(1000 * parameter['Lmax'])
+    gamma = 0.01 / parameter['Lmax']
 
+    maxit = parameter['maxit']
     info = {'itertime': np.zeros(maxit), 'fx': np.zeros(maxit), 'iter': maxit}
 
     # Main loop.
@@ -587,8 +713,14 @@ def SVR(fx, gradf, gradfsto, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        
-        #### YOUR CODES HERE
+        x_next = np.zeros(x.shape[0])
+        x_tilde = x
+        v_k = gradf(x)
+        for _ in range(q):
+            # Pick i u.a.r.
+            i = np.random.randint(parameter['no0functions'])
+            x_tilde -= gamma * (gradfsto(x_tilde, i) - gradfsto(x, i) + v_k)
+            x_next += x_tilde / q
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.time() - tic
@@ -599,9 +731,6 @@ def SVR(fx, gradf, gradfsto, parameter):
             print('Iter = {:4d},  f(x) = {:0.9f}'.format(iter, info['fx'][iter]))
 
         # Prepare the next iteration
-        x= x_next
+        x = x_next
 
     return x, info
-
-
-
