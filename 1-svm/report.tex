@@ -142,6 +142,37 @@
 \end{enumerate}
 
 \subsection*{Problem 2 - First order methods for SVM}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.4]{2_iterations}
+    \caption{Comparison in number of iterations for deterministic first-order methods}
+    \label{fig:2_iterations}
+\end{figure}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.4]{2_time}
+    \caption{Comparison in time for deterministic first-order methods}
+    \label{fig:2_time}
+\end{figure}
+
+\begin{enumerate}[label=(\alph*)]
+    \item \textbf{GD and GDstr: }As already expected, the gradient descent considering both the strong convexity of the function to optimize and its smoothness converges faster than that only considering smoothness (see Figure \ref{fig:2_iterations}). Moreover, the cost of each iteration is exactly the same since we are doing the same number of iterations but only changing the learning rate. This can be seen in Figure \ref{fig:2_time}.
+    
+    \item \textbf{AGD and AGDstr: }Unlike the previous case, the Accelerated Gradient Descent algorithm works worse when we use information about the strong convexity of the function. Moreover, the cost per iteration is essentially the same as in the previous case, so we this algorithms beat naive gradient descent in both number of iterations and time to converge.
+    % TODO: Review this
+    
+    \item \textbf{LSGD and LAGD: }We converge with less iterations when we use the previous procedures with a step size that takes into account the local geometry. This step size is found by a linear search procedure, which translates into more cost (and thus more time) per iteration. Nevertheless, in this case we can see that the overhead is not significant enough for the previous algorithms to beat this version at almost any time.
+    
+    \item \textbf{AGDR and LAGDR: }The drawback of accelerated methods are that they are not monotone. In fact we can see the so-called Nesterov Ripples (oscillations) caused by the high momentum term, which is restarted in these algorithms every time we increase the cost with respect to the previous iteration.
+    
+    For this reason, each of these algorithms is exactly the same as their non-restart version until the first oscillation. By construction, the restart version is now monotonic and thus the objective value decreases much faster than with the non-restart version.
+    
+    Nevertheless, note that iterations are slightly more costly with the restart version, specially when we actually restart since we compute two gradient steps in this iteration. Hence, in Figure \ref{fig:2_time}, we don't see the non-restart and restart versions sticking together for the first iterations as in Figure \ref{fig:2_iterations}.
+    
+    \item \textbf{AdaGrad: }This algorithm adapts to the local geometry of the problem with first-order information and doesn't need the Lipschitz constant as all the previous algorithms do. As seen in Figures \ref{fig:2_iterations} and \ref{fig:2_iterations}, this algorithm converges faster than Gradient Descent both in the number of iterations are in time, even if Gradient Descent uses an step size that is optimized for the Lipschitz and strong convexity constants of the function to optimize. Moreover, this algorithm introduces two new hyper-parameters, whose tuning sometimes could make a big difference.
+    
+    \item \textbf{ADAM: }Even if this algorithms can fail to converge to the global minimum of a convex problem, usually performs well. Indeed in this case it converges faster that the previous adaptive algorithm and even than AGD. ADAM introduces four new hyper-parameters and thus depending on the time that we have to tune them or the performance in some problem with them taking the usual values, we may prefer other algorithms even if ADAM could achieve better results with the right tuning.
+\end{enumerate}
 
 \subsection*{Problem 3 - Stochastic Gradient methods for SVM}
 \begin{enumerate}[label=(\alph*)]
@@ -154,7 +185,6 @@
     \end{align}
     where the last equality is the one already found in \eqref{eq:1}.
     
-    \item
     \begin{assumption}
         Assume w.l.o.g. that sample $i_k$ lies in the quadratic region
         \label{as:1}
@@ -178,20 +208,25 @@
     \end{align}
     hence global smoothness is the same (valid upper bound) even if it's not locally tight for the samples in the linear region.
     
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[scale=0.4]{3_iterations}
+        \caption{Comparison in number of iterations for stochastic first-order methods}
+        \label{fig:3_iterations}
+    \end{figure}
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[scale=0.4]{3_time}
+        \caption{Comparison in time for stochastic first-order methods}
+        \label{fig:3_time}
+    \end{figure}
+    
+    \item \textbf{SGD: }This algorithm has become the workhorse for training supervised machine learning problems which have a sum-structured objective function since the cost per iteration can be up to $n$ times cheaper than that of GD, where $n$ is the number of samples. When comparing to GD with respect to the number of iterations (Figure \ref{fig:3_iterations}), we see that the SGD requires a lot more iterations to converge since at each iteration we are only considering one random sample instead of the whole data as GD does. Nevertheless, the turns change when we compare these algorithms in time. As seen in Figure \ref{fig:3_time}, before that GD performs the first iteration, SGD has achieved an objective value that can be good enough for some applications or even be used prior to methods that need a close start such as Newton's.
+    
+    \item \textbf{SAG: }When averaging stochastic gradients, we eventually get something similar to Gradient Descent if the variation of each gradient from one iteration to another is tiny. Thus, we can see that in comparison to SGD, we get better performance for the last iterations with exactly the same cost per iteration.
+    
+    \item \textbf{SVR: }This algorithm is the one that performs the best among all the ones seen before with respect to the number of iterations, since it essentially has converged with the first iteration. Nevertheless, the variance reduction incurs an overhead at each iteration, making it cost $\mathcal{O}(1000L_{\max})$ times that of SGD. For this reason, we can see in Figure \ref{fig:3_time} that when SVR performs the first iteration, SGD has already done more than 2500 iterations.
+    
 \end{enumerate}
-
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.4]{Figure_1}
-    \caption{Caption}
-    \label{fig:my_label}
-\end{figure}
-
-\begin{itemize}
-    \item Why do the algorithms in second graph start at different times?
-    \item Emphasize Nesterov ripples and similarity of restart version until the first ripple.
-    \item Compare algorithms also for the hyperparameters they use
-    \item Can also do time analysis for first graph and iterations for second
-\end{itemize}
 
 \end{document}
