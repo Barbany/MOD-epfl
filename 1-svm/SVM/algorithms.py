@@ -425,7 +425,6 @@ def LSAGDR(fx, gradf, parameter):
 
         # Update the next iteration. (main algorithmic steps here!)
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
-        # TODO: Review
         # Compute local smoothness
         d = - gradf(y)
         L *= 0.5
