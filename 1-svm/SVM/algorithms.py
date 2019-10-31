@@ -567,7 +567,7 @@ def ADAM(fx, gradf, parameter):
     return x, info
 
 
-def SGD(fx, gradf, parameter):
+def SGD(fx, gradfsto, parameter):
     """
     Function:  [x, info] = GD(fx, gradf, parameter)
     Purpose:   Implementation of the gradient descent algorithm.
@@ -598,7 +598,7 @@ def SGD(fx, gradf, parameter):
         # Use the notation x_next for x_{k+1}, and x for x_{k}, and similar for other variables.
         # Pick i u.a.r
         i = np.random.randint(parameter['no0functions']) 
-        x_next = x - gradf(x, i) / (iter + 1)
+        x_next = x - gradfsto(x, i) / (iter + 1)
 
         # Compute error and save data to be plotted later on.
         info['itertime'][iter] = time.time() - tic
