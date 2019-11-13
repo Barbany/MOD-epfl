@@ -13,7 +13,7 @@ class LinearGenerator(nn.Module):
         """
         Evaluate on a sample. The variable z contains one sample per row
         """
-        # TODO
+        return torch.add(torch.matmul(self.W, z.unsqueeze(2)).squeeze(), self.b)
 
 
 class LinearDualVariable(nn.Module):
@@ -25,10 +25,11 @@ class LinearDualVariable(nn.Module):
         """
         Evaluate on a sample. The variable x contains one sample per row
         """
-        # TODO
+        return torch.matmul(self.v.T, x.unsqueeze(2))
 
     def enforce_lipschitz(self):
         """Enforce the 1-Lipschitz condition of the function"""
         with torch.no_grad():
-            # TODO
+            # Normalize vector
+            self.v = nn.Parameter(self.v / torch.norm(self.v, p=2))
 

@@ -39,9 +39,8 @@ class AdagradOptimizer(optimizer):
             self.r = [torch.zeros(p.size()) for p in model.parameters()]
 
         for i, p in enumerate(model.parameters()):
-            ## TODO
-            raise NotImplementedError('You should write your code HERE')
-
+            self.r[i] = self.r[i] + p.grad**2
+            p.grad *= self.learning_rate / (self.delta + torch.sqrt(self.r[i]))
 
 class RMSPropOptimizer(optimizer):
     def __init__(self, args):
@@ -55,9 +54,8 @@ class RMSPropOptimizer(optimizer):
             self.r = [torch.zeros(p.size()) for p in model.parameters()]
 
         for i, p in enumerate(model.parameters()):
-            ## TODO
-            raise NotImplementedError('You should write your code HERE')
-
+            self.r[i] = self.tau * self.r[i] + (1 - self.tau) * p.grad**2
+            p.grad *= self.learning_rate / (self.delta + torch.sqrt(self.r[i]))
 
 class AdamOptimizer(optimizer):
     def __init__(self, args):
@@ -78,8 +76,11 @@ class AdamOptimizer(optimizer):
             self.iteration = 1
 
         for i, p in enumerate(model.parameters()):
-            ## TODO
-            raise NotImplementedError('You should write your code HERE')
+            self.m1[i] = self.beta1 * self.m1[i] + (1 - self.beta1) * p.grad
+            self.m2[i] = self.beta2 * self.m2[i] + (1 - self.beta2) * p.grad ** 2
+            m1_hat = self.m1[i] / (1 - self.beta1 ** self.iteration)
+            m2_hat = self.m2[i] / (1 - self.beta2 ** self.iteration)
+            p.grad = self.learning_rate * m1_hat / (self.delta + torch.sqrt(m2_hat)) 
 
         self.iteration = self.iteration+1
 

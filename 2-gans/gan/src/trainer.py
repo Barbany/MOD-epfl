@@ -69,19 +69,39 @@ class GanTrainer():
             data_sample (torch.tensor): sample from the true distribution
             noise_sample (torch.tensor): sample from the noise distribution
         """
-        # TODO
+        return torch.mean(f(data_sample) - f(g(noise_sample)))
 
     def simultaneous_update(self, f, g, f_optim, g_optim):
         """
         Update dual variable and generator at the same time
         """
-        # TODO
+        f_optim.zero_grad()
+        g_optim.zero_grad()
+
+        loss = self.objective(f, g, self.data.sample((self.batch_size,)), self.noise.sample((self.batch_size,)))
+        loss.backward()
+    
+        f_optim.step()
+        
+        g_optim.step()
 
     def alternating_update(self, f, g, f_optim, g_optim):
         """
         Update dual variable, then update generator
         """
-        # TODO
+        f_optim.zero_grad()
+        
+        loss = self.objective(f, g, self.data.sample((self.batch_size,)), self.noise.sample((self.batch_size,)))
+        loss.backward()
+    
+        f_optim.step()
+       
+        g_optim.zero_grad()
+        
+        loss = self.objective(f, g, self.data.sample((self.batch_size,)), self.noise.sample((self.batch_size,)))
+        loss.backward()
+
+        g_optim.step()
 
     def simultaneous(self, n_iter, f, g, f_optim, g_optim, n_checkpoints):
         """
