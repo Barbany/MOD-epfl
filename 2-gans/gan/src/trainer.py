@@ -90,14 +90,12 @@ class GanTrainer():
         Update dual variable, then update generator
         """
         f_optim.zero_grad()
-        
         loss = self.objective(f, g, self.data.sample((self.batch_size,)), self.noise.sample((self.batch_size,)))
         loss.backward()
     
         f_optim.step()
        
         g_optim.zero_grad()
-        
         loss = self.objective(f, g, self.data.sample((self.batch_size,)), self.noise.sample((self.batch_size,)))
         loss.backward()
 
@@ -135,7 +133,7 @@ class GanTrainer():
         ckpts = math.floor(n_iter / n_checkpoints)
 
         for _ in tqdm(range(n_iter)):
-            self.simultaneous_update(f, g, f_optim, g_optim)
+            self.alternating_update(f, g, f_optim, g_optim)
             f.enforce_lipschitz()
 
             if self.make_gif:
