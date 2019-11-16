@@ -8,6 +8,7 @@
 \usepackage{booktabs}
 \usepackage[T1]{fontenc}
 \usepackage{indentfirst}
+\usepackage{float}
 
 \usepackage{graphicx}
 \usepackage{epstopdf}
@@ -91,7 +92,7 @@
         \label{eq:grad}
     \end{align}
     
-    The first order stationary points are $\{(x,y):\ \nabla f(x,y)=\0\}=(0,0)$, so there's actually only one of such.
+    The first order stationary points are $\{(x,y):\ \nabla f(x,y)=\0\}=\{(x,y): x=0, y=0)\}$, so there's actually only one of such.
     
     \begin{align}
         \nabla^2 f(x, y) = 
@@ -105,16 +106,18 @@
         \end{bmatrix}
     \end{align}
     
-    The Hessian gives information about the type of first order stationary points. In this case, it has eigenvalues $\lambda = [0, 1]$ in all domain, so $(0,0)$ is a saddle point
+    The Hessian gives information about the type of first order stationary points. In this case, it has eigenvalues $\lambda = [0, 1]$ in all domain, so in particular $(0,0)$ is a saddle point since the Hessian is not positive definite nor negative definite.
     
     \item For $(x^*, y^*)=(0,0)$, it's trivial to see that $0=f(x^*, y^*)\geq f(x^*, y)=0$ and $0=f(x^*, y^*)\leq f(x, y^*)=0$, so indeed $(x^*, y^*)$ is a solution to the problem $\min_x \max_y f(x,y)$.
     
-    \item The distance in L2-norm to the optimal solution in iteration $k+1$ is
+    \item The distance in squared L2-norm to the optimal solution in iteration $k+1$ is
     \begin{align}
-        \norm{(x_{k+1},y_{k+1})-(0,0)}^2&:=\norm{(x_{k}-\gamma y_k,y_k-\gamma x_k)}^2:=x_k^2 - 2\gamma x_k y_k + \gamma^2 y_k + y_k^2 + 2\gamma y_k x_k + \gamma^2 x_k^2\\
-        &=(1+\gamma^2)(x_k^2 + y_k^2) := (1+\gamma^2) \norm{(x_k,y_k)}^2=(1+\gamma^2)^{k+1}\norm{(x_0,y_0)}^2
+        \norm{(x_{k+1},y_{k+1})-(x^*,y^*)}^2&:=\norm{(x_{k}-\gamma y_k,y_k-\gamma x_k)}^2\\
+        &:=x_k^2 - 2\gamma x_k y_k + \gamma^2 y_k + y_k^2 + 2\gamma y_k x_k + \gamma^2 x_k^2\\
+        &=(1+\gamma^2)(x_k^2 + y_k^2) := (1+\gamma^2) \norm{(x_k,y_k)}^2=(1+\gamma^2)^{k+1}\norm{(x_0,y_0)}^2 \\
+        &=(1+\gamma^2)^{k+1}\norm{(x_{0},y_{0})-(x^*,y^*)}^2
     \end{align}
-    so if $(x_0,y_0)\neq \0$, the iterates diverge as $\mathcal{O}((1+\gamma^2)^k)$.
+    so if $(x_0,y_0)\neq \0$, the iterates diverge as $\mathcal{O}((1+\gamma^2)^k)$ in terms of the distance (in termss of the squared L2-norm) to the optimum in iterate $k$ from the initial distance to the optimum.
     \item 
     \begin{align}
         |f(\xx) - f(\yy)| = |\vv^T(\xx - \yy)| := |\lin{\xx - \yy, \vv^*}| \leq \norm{\vv} \norm{\xx - \yy} := B \norm{\xx - \yy}
@@ -123,32 +126,34 @@
     
     \item Note that in order to enforce that a function $f\in \mathcal{F}$ is $1-$Lipschitz, it's enough to normalize its vector $\vv$ so as it has unit norm, i.e. $\vv \leftarrow \frac{\vv}{\norm{\vv}}$.
     \item 
-    The performance of the simultaneous and alternating updates is similar. The estimates at some iterations for this latter approach can be seen in Figure \ref{fig:gan}. Its oscillatory behavior is discussed in the last section of this exercise.
+    The performance with alternating updates is better than that with simultaneous updates. The estimates at some iterations for this latter approach can be seen in Figure \ref{fig:gan}. Both show an oscillatory behavior that is discussed in the last section of this exercise, but in the case of the alternating updates, the mean of the distribution estimated at each iterate is closer than the true mean. We could say that the alternating updates allow to more rapidly adapt to the first moment of the true distribution. For further comparison, see the \texttt{gif} files included in the deliverable.
+    
     \begin{figure}
         \centering
         \begin{minipage}{.3\textwidth}
-         \includegraphics[width=.9\textwidth]{gan1}
+         \includegraphics[width=.9\textwidth]{img/gan1}
         \end{minipage}
         \begin{minipage}{.3\textwidth}
-         \includegraphics[width=.9\textwidth]{gan2}
+         \includegraphics[width=.9\textwidth]{img/gan2}
         \end{minipage}
         \begin{minipage}{.3\textwidth}
-        \includegraphics[width=.9\textwidth]{gan3}
+        \includegraphics[width=.9\textwidth]{img/gan3}
         \end{minipage}
-        \caption{Snapshots of the evolution with alternating updates}
+        \caption{Snapshots of the evolution with simultaneous updates}
         \label{fig:gan}
     \end{figure}
     
     \item 
+    By definition of $f$, linearity of the expectation and given that $\vv$ is deterministic,
     \begin{align}
-        \max_{f \in \mathcal{F}} \E_{\XX\sim \mu}[f(\XX)] - \E_{\YY\sim \nu}[f(\YY)] = \max_{v \in \mathbb{R}^2} \vv^T (\E_{\XX\sim \mu}[\XX] - \E_{\YY\sim \nu}[\YY]) \geq 0
+        \max_{f \in \mathcal{F}} \E_{\XX\sim \mu}[f(\XX)] - \E_{\YY\sim \nu}[f(\YY)] = \max_{\vv \in \mathbb{R}^2} \vv^T (\E_{\XX\sim \mu}[\XX] - \E_{\YY\sim \nu}[\YY]) \geq 0
         \label{eq:dist}
     \end{align}
     where the inequality follows by setting $\vv = \0$, which is not necessarily the maximum.
     
     \item In the case that the first moment coincide for both distributions $\mu$ and $\nu$, we have that $\E_{\XX\sim \mu}[\XX] = \E_{\YY\sim \nu}[\YY]$, so \eqref{eq:dist} is satisfied with equality in this case.
     
-    This is explains the observed behavior of the GAN since it can estimate the first moment but higher order moments such as the covariance defining the shape of the true distribution. Hence, the obtained distribution keeps oscillating around a zero mean distribution but don't converge to the true one.
+    This explains the observed behavior in the GAN experiment, since it can estimate the first moment but not higher order moments such as the covariance defining the shape of the true distribution. Hence, the obtained distribution keeps oscillating around a zero mean distribution but doesn't converge to the true one.
     
 \end{enumerate}
 
@@ -165,28 +170,28 @@ The training accuracy and cross-entropy loss for several optimizers and learning
     
     \item \texttt{rmsprop: }Similarly to AdaGrad, we have adapting learning rate, but in this case, the updates of the effective step size from one iteration to the following one, are in a moving average fashion instead of a simple hard assignment. This is specially beneficial for the learning rate of $10^{-5}$, where we have a rather flat region where AdaGrad slowly converges. Nevertheless, we can see that for a large initial step size, the moving average updates don't allow to rapidly change the effective step size as it happens with AdaGrad.
     
-    \item \texttt{adam: }In addition to RMSProp, ADAM uses 2nd order moment estimation. Hence, we observe the same flat behavior for the large step size as RMSProp and as discussed earlier, the momentum doesn't help in this case. With lower learning rates, Adam achieves the best performance since it can adapt its learning rate and further accelerate if the descent direction remains the same from one iteration to another with the momentum term.
+    \item \texttt{adam: }In addition to RMSProp, ADAM uses second order moment estimation. Hence, we observe the same flat behavior for the large step size as RMSProp and as discussed earlier, the momentum doesn't help in this case. With lower learning rates, Adam achieves the best performance since it can adapt its learning rate and further accelerate if the descent direction remains the same from one iteration to another with the momentum term.
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[H]
         \centering
         \begin{minipage}{.45\textwidth}
-         \includegraphics[width=.9\textwidth]{acc_05}
+         \includegraphics[width=.9\textwidth]{img/acc_05}
         \end{minipage}
         \begin{minipage}{.45\textwidth}
-         \includegraphics[width=.9\textwidth]{loss_05}
+         \includegraphics[width=.9\textwidth]{img/loss_05}
         \end{minipage}
         \begin{minipage}{.45\textwidth}
-         \includegraphics[width=.9\textwidth]{acc_001}
+         \includegraphics[width=.9\textwidth]{img/acc_001}
         \end{minipage}
         \begin{minipage}{.45\textwidth}
-         \includegraphics[width=.9\textwidth]{loss_001}
+         \includegraphics[width=.9\textwidth]{img/loss_001}
         \end{minipage}
         \begin{minipage}{.45\textwidth}
-         \includegraphics[width=.9\textwidth]{acc_1e-05}
+         \includegraphics[width=.9\textwidth]{img/acc_1e-05}
         \end{minipage}
         \begin{minipage}{.45\textwidth}
-         \includegraphics[width=.9\textwidth]{loss_1e-05}
+         \includegraphics[width=.9\textwidth]{img/loss_1e-05}
         \end{minipage}
         \caption{Comparison of the implemented optimizers for various learning rates over 3 runs}
         \label{fig:optim}
