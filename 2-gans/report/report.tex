@@ -106,7 +106,7 @@
         \end{bmatrix}
     \end{align}
     
-    The Hessian gives information about the type of first order stationary points. In this case, it has eigenvalues $\lambda = [0, 1]$ in all domain, so in particular $(0,0)$ is a saddle point since the Hessian is not positive definite nor negative definite.
+    The Hessian gives information about the type of first order stationary points. In this case, it has eigenvalues $\lambda = [-1, 1]$ in all domain, so in particular $(0,0)$ is a saddle point since the Hessian is not positive definite nor negative definite.
     
     \item For $(x^*, y^*)=(0,0)$, it's trivial to see that $0=f(x^*, y^*)\geq f(x^*, y)=0$ and $0=f(x^*, y^*)\leq f(x, y^*)=0$, so indeed $(x^*, y^*)$ is a solution to the problem $\min_x \max_y f(x,y)$.
     
@@ -117,7 +117,7 @@
         &=(1+\gamma^2)(x_k^2 + y_k^2) := (1+\gamma^2) \norm{(x_k,y_k)}^2=(1+\gamma^2)^{k+1}\norm{(x_0,y_0)}^2 \\
         &=(1+\gamma^2)^{k+1}\norm{(x_{0},y_{0})-(x^*,y^*)}^2
     \end{align}
-    so if $(x_0,y_0)\neq \0$, the iterates diverge as $\mathcal{O}((1+\gamma^2)^k)$ in terms of the distance (in termss of the squared L2-norm) to the optimum in iterate $k$ from the initial distance to the optimum.
+    so if $(x_0,y_0)\neq \0$, the iterates diverge as $\mathcal{O}((1+\gamma^2)^k)$ in terms of the distance (in terms of the squared L2-norm) to the optimum in iterate $k$ from the initial distance to the optimum.
     \item 
     \begin{align}
         |f(\xx) - f(\yy)| = |\vv^T(\xx - \yy)| := |\lin{\xx - \yy, \vv^*}| \leq \norm{\vv} \norm{\xx - \yy} := B \norm{\xx - \yy}
