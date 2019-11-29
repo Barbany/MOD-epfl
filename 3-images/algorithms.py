@@ -129,12 +129,13 @@ def prox_sg(fx, gx, stocgradfx, proxg, params):
         num += gamma(k) * X
         den += gamma(k)
 
-        run_details['conv'][k] = fx(X) + lmbd * gx(X)
+        X_erg = num / den
+        run_details['conv'][k] = fx(X_erg) + lmbd * gx(X_erg)
 
         if k % params['iter_print'] == 0:
-            print_progress(k, params['maxit'], run_details['conv'][k], fx(X), gx(X))
+            print_progress(k, params['maxit'], run_details['conv'][k], fx(X_erg), gx(X_erg))
 
-    run_details['X_final'] = num / den
+    run_details['X_final'] = X_erg
     
     print_end_message(method_name, time.time() - tic)
     return run_details
