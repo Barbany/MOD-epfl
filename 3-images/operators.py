@@ -11,38 +11,38 @@ from random import randint
 
 
 def l1_prox(y, weight):
-    ############## YOUR CODES HERE ##############
-    raise NotImplemented('Implement the method!')
-
+    return maximum(absolute(y) - weight, np.zeros(y.shape)) * sign(y)
 
 def l2_prox(y, weight):
-    ############## YOUR CODES HERE ##############
-    raise NotImplemented('Implement the method!')
+    return y / (1 + weight)
 
+def gradfx(X, A, Y):
+    n, c = Y.shape
+    
+    Z = np.zeros((n, n))
+    for i in range(n):
+        Z[i, i] = 1 / (np.sum(exp([A[i] @ X[:, j] for j in range(c)])))
+    
+    return A.T @ (Z @ exp(A @ X) - Y)
 
-def gradfx(X, A, b):
-    ############## YOUR CODES HERE ##############
-    raise NotImplemented('Implement the method!')
+def stocgradfx(X, minibatch_size, A, Y):
+    n = A.shape[0]
+    c = X.shape[1]
 
-
-def stocgradfx(X, minibatch_size, A, b):
-    ############## YOUR CODES HERE ##############
-    raise NotImplemented('Implement the method!')
-
+    rows = np.random.choice(n, minibatch_size, replace=False)
+    return n * np.sum([np.outer(A[row], exp(A[row] @ X) / np.sum([exp(A[row] @ X[:, j]) for j in range(c)]) - Y[row]) \
+                       for row in rows]) / minibatch_size
 
 def fx(X, A, b):
     num_samples = A.shape[0]
     return sum(log(sum(exp(A @ X), axis=1)), axis=0) \
            - sum([dot(A[i, :], X[:, b[i]]) for i in range(0, num_samples)])
 
-
 def norm1(X):
     return np.linalg.norm(X.flatten('F'), 1)
 
-
 def norm2sq(X):
     return (1.0 / 2) * np.linalg.norm(X, 'fro') ** 2
-
 
 ##########################################################################
 # Operators for Exercise 2
@@ -71,7 +71,6 @@ def TV_norm(X, opt=None):
 
 # P_Omega and P_Omega_T
 def p_omega(x, indices):  # P_Omega
-
     return np.expand_dims(x[np.unravel_index(indices, x.shape)], 1)
 
 
