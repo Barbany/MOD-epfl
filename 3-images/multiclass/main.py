@@ -1,4 +1,4 @@
-    import time
+import time
 import sys
 sys.path.append('../')
 
@@ -18,7 +18,7 @@ RAND_SEED = 666013
 
 def call_all_methods(fx, gx, gradfx, stocgradfx, prox_fc, params):
     all_results = dict()
-
+    
     params['maxit'] = params['maxit_determ']
     all_results['ISTA'] = ista(fx, gx, gradfx, prox_fc, params)
 
@@ -27,7 +27,7 @@ def call_all_methods(fx, gx, gradfx, stocgradfx, prox_fc, params):
 
     params['restart_fista'] = True
     all_results['FISTA-RESTART'] = fista(fx, gx, gradfx, prox_fc, params)
-
+    
     params['maxit'] = params['maxit_stoch']
     all_results['PROX-SG'] = prox_sg(fx, gx, stocgradfx, prox_fc, params)
 
@@ -45,8 +45,7 @@ def main():
     gradfx = lambda Y: operators.gradfx(Y, A_train, b_train_binarized)
     stocgradfx = lambda Y, minimabtch_size: operators.stocgradfx(Y, minimabtch_size, A_train, b_train_binarized)
 
-    Lips = ############## YOUR CODES HERE ##############
-
+    Lips = norm2sq(A_train)
     f_star_l1, X_opt_l1, f_star_l2, X_opt_l2 = read_f_star(fx, lmbd_l1, lmbd_l2)
 
     params = {
