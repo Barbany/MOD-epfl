@@ -22,7 +22,7 @@ params = {
     'rate': 0.4,
 }
 
-image = load_image('data/gandalf.jpg', params['shape'])
+image = load_image('data/me.jpg', params['shape'])
 
 im_us, mask = apply_random_mask(image, params['rate'])
 
