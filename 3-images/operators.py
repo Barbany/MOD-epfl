@@ -18,11 +18,7 @@ def l2_prox(y, weight):
 
 def gradfx(X, A, Y):
     n, c = Y.shape
-    
-    Z = np.zeros((n, n))
-    for i in range(n):
-        Z[i, i] = 1 / (np.sum(exp([A[i] @ X[:, j] for j in range(c)])))
-    
+    Z = np.diag(1 / sum(exp(A @ X), axis=1))
     return A.T @ (Z @ exp(A @ X) - Y)
 
 def stocgradfx(X, minibatch_size, A, Y):
