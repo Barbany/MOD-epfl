@@ -10,13 +10,13 @@ import numpy as np
 import operators
 
 from operators import l1_prox, l2_prox, norm1, norm2sq
-from plot_utils import plot_convergence, plot_digit_features
+from plot_utils import plot_convergence, plot_digit_features, plot_bounds
 from algorithms import fista, ista, prox_sg
 from utils import *
 
 RAND_SEED = 666013
 
-def call_all_methods(fx, gx, gradfx, stocgradfx, prox_fc, params):
+def call_all_methods(fx, gx, gradfx, stocgradfx, prox_fc, params, reg):
     all_results = dict()
     
     params['maxit'] = params['maxit_determ']
@@ -30,7 +30,7 @@ def call_all_methods(fx, gx, gradfx, stocgradfx, prox_fc, params):
     
     params['maxit'] = params['maxit_stoch']
     all_results['PROX-SG'] = prox_sg(fx, gx, stocgradfx, prox_fc, params)
-
+    
     return all_results
 
 def main():
@@ -66,16 +66,17 @@ def main():
     print(Lips)
 
     params['lambda'] = lmbd_l1
-    all_results_l1 = call_all_methods(fx, operators.norm1, gradfx, stocgradfx, operators.l1_prox, params)
+    all_results_l1 = call_all_methods(fx, operators.norm1, gradfx, stocgradfx, operators.l1_prox, params, 'l1_reg')
     plot_convergence(all_results_l1, f_star_l1, epoch_to_iteration_exchange_rate, 'L1 - regularized LogisticRegression')
     plot_digit_features(all_results_l1['FISTA-RESTART']['X_final'], 'Visualization of solution for L1 - regularized LogisticRegression')
+    plot_bounds(all_results_l1, f_star_l1, X_opt_l1, params['x0'], Lips, r'$\ell_1$' + ' regularization')
     print('FISTA-RESTART-l1 accuracy = {:f}%.\n'.format(compute_accuracy(all_results_l1['FISTA-RESTART']['X_final'], A_test, b_test) * 100))
 
     params['lambda'] = lmbd_l2
-    all_results_l2 = call_all_methods(fx, operators.norm2sq, gradfx, stocgradfx, operators.l2_prox, params)
+    all_results_l2 = call_all_methods(fx, operators.norm2sq, gradfx, stocgradfx, operators.l2_prox, params, 'l2_reg')
     plot_convergence(all_results_l2, f_star_l2, epoch_to_iteration_exchange_rate, 'L2 - regularized LogisticRegression')
     plot_digit_features(all_results_l2['FISTA-RESTART']['X_final'], 'Visualization of solution for L2 - regularized LogisticRegression')
-
+    plot_bounds(all_results_l2, f_star_l2, X_opt_l2, params['x0'], Lips, r'$\ell_2$' + ' regularization')
     print('FISTA-RESTART-l2 accuracy = {:f}%.\n'.format(
         compute_accuracy(all_results_l2['FISTA-RESTART']['X_final'], A_test, b_test) * 100))
 

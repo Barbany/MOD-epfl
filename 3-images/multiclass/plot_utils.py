@@ -2,6 +2,32 @@ import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 import numpy as np
 
+
+def plot_bounds(results, fs_star, x_opt, x0, Lips, title):
+    colors = { 'ISTA': 'red', 'FISTA': 'blue', 'FISTA-RESTART': 'green'}
+
+    for key in ['ISTA', 'FISTA', 'FISTA-RESTART']:
+        if key in results:
+            num_iterations = len(results[key]['conv'])
+            k = np.array(range(0, num_iterations))
+            plt.plot(k, abs(results[key]['conv'] - fs_star) / fs_star,
+                                                                color=colors[key], lw=2, label=key)
+            
+            # Plot theoretical bounds
+            R_0 = np.linalg.norm(x0 - x_opt) ** 2
+            if key == 'ISTA':
+                plt.plot(k, Lips * R_0 / (2 * (k + 2) * fs_star), color=colors[key], lw=2, linestyle='dashed')
+            elif key == 'FISTA':
+                plt.plot(k, 2 * Lips * R_0 / ((k + 2) ** 2 * fs_star), color=colors[key], lw=2, linestyle='dashed')
+
+    plt.legend()
+    plt.title(title)
+    plt.xlabel('#iterations')
+    plt.ylabel(r'$ |f(\mathbf{x}^k) - f^\star|  /  f^\star$')
+    plt.ylim(1e-8, 1e6)
+    plt.yscale('log')
+    plt.show()
+
 def plot_convergence(results, fs_star, epoch_to_iteration_exchange_rate, title):
     colors = { 'ISTA': 'red', 'FISTA': 'blue', 'FISTA-RESTART': 'green', 'PROX-SG': 'magenta'}
     # DETERM
