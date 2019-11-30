@@ -12,6 +12,9 @@ from utils import apply_random_mask, psnr, load_image
 from operators import TV_norm, RepresentationOperator, p_omega, p_omega_t, l1_prox
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+import torch
+from unrolled_network import ResNetDC, train_epoch
+
 
 def FISTA(gradf, proxg, params):
     # Parameter setup
@@ -90,9 +93,48 @@ def reconstruct_TV(image, indices, optimizer, params):
     return x.reshape((params['m'], params['m'])), time
 
 
+def reconstruct_nn(image, mask, params):
+    image_torch = torch.tensor(image).view(1, 1, params['shape'][0], params['shape'][1]).float()
+
+    class Dataset(torch.utils.data.Dataset):
+        """Characterizes a dataset for PyTorch"""
+        def __init__(self):
+            """Initialization"""
+
+        def __len__(self):
+            """Denotes the total number of samples"""
+            return 1
+
+        def __getitem__(self, index):
+            """Generates one sample of data"""
+            if index == 0:
+                return image_torch, None
+            else:
+                raise IndexError
+
+    model = ResNetDC(2, unroll_depth=5)
+    optimizer = torch.optim.Adam(model.parameters())
+    data_loader = Dataset()
+
+    args = {'rate': params['rate'], 'device': 'cpu', 'report_interval': 1, 'num_epochs': 4}
+
+    t_start = time.time()
+    for epoch in range(params['maxit']):
+        train_epoch(args, epoch, model, data_loader, optimizer)
+    time_nn = time.time() - t_start
+
+    with torch.no_grad():
+        mask_torch = torch.tensor(mask).view(1, 1, params['shape'][0], params['shape'][1]).float()
+        im_us_torch = image_torch * mask_torch
+
+        reconstruction = model(im_us_torch, mask_torch)
+        reconstruction = reconstruction[0, 0, :, :].cpu().numpy()
+    return reconstruction, time_nn
+
+
 def plot_performance(image, image_us, reconstruction, time, method):
     psnr_rec = psnr(image, reconstruction)
-    ssim_rec = ssim(image, reconstruction)
+    ssim_rec = ssim(image, reconstruction, data_range=np.max(image))
 
     fig, ax = plt.subplots(1, 4, figsize=(15, 5))
 
@@ -129,14 +171,24 @@ if __name__ == "__main__":
         'rate': 0.4,
         'N': shape[0] * shape[1]
     }
-    PATH = 'data/gandalf.jpg'
+    PATH = 'data/me.jpg'
     image = load_image(PATH, params['shape'])
 
     im_us, mask = apply_random_mask(image, params['rate'])
     indices = np.nonzero(mask.flatten(order='F'))[0]
     params['indices'] = indices
-    
+
+    # Section (a): Comparison with 500 iterations
     im_l1, time_l1 = reconstruct_l1(image, indices, FISTA, params)
     plot_performance(image, im_us, im_l1, time_l1, 'L1')
     im_tv, time_tv = reconstruct_TV(image, indices, FISTA, params)
     plot_performance(image, im_us, im_tv, time_tv, 'TV')
+
+    # Section (b): Comparison with 5 iterations
+    params['maxit'] = 5
+    im_l1, time_l1 = reconstruct_l1(image, indices, FISTA, params)
+    plot_performance(image, im_us, im_l1, time_l1, '5 iterations L1')
+    im_tv, time_tv = reconstruct_TV(image, indices, FISTA, params)
+    plot_performance(image, im_us, im_tv, time_tv, '5 iterations TV')
+    im_nn, time_nn = reconstruct_nn(image, mask, params)
+    plot_performance(image, im_us, im_nn, time_nn, '5 iterations Neural Network')
