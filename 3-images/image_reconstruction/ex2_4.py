@@ -121,7 +121,6 @@ def reconstruct_nn(image, mask, params):
     t_start = time.time()
     for epoch in range(params['maxit']):
         train_epoch(args, epoch, model, data_loader, optimizer)
-    time_nn = time.time() - t_start
 
     with torch.no_grad():
         mask_torch = torch.tensor(mask).view(1, 1, params['shape'][0], params['shape'][1]).float()
@@ -129,7 +128,7 @@ def reconstruct_nn(image, mask, params):
 
         reconstruction = model(im_us_torch, mask_torch)
         reconstruction = reconstruction[0, 0, :, :].cpu().numpy()
-    return reconstruction, time_nn
+    return reconstruction, time.time() - t_start
 
 
 def plot_performance(image, image_us, reconstruction, time, method):
