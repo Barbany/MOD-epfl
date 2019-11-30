@@ -1,13 +1,13 @@
 import sys
+
 sys.path.append('../')
 
 import time
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage.restoration import denoise_tv_chambolle
-from skimage.measure import compare_ssim as ssim
 
-from utils import apply_random_mask, psnr, load_image, print_start_message, print_end_message 
+from utils import apply_random_mask, psnr, load_image, print_start_message, print_end_message
 from operators import TV_norm, RepresentationOperator, p_omega, p_omega_t, l1_prox
 
 
@@ -20,7 +20,7 @@ def FISTA(fx, gx, gradf, proxg, params):
     # Parameter setup
     lmbd = params['lambda']
     alpha = 1 / params['Lips']
-    
+
     x = params['x0']
     y = params['x0']
     t = 1
@@ -35,7 +35,7 @@ def FISTA(fx, gx, gradf, proxg, params):
         # Update parameters
         x = x_next
         t = t_next
-        
+
         # Record convergence
         F_x = fx(x) + lmbd * gx(x)
         info.append(F_x)
@@ -43,13 +43,14 @@ def FISTA(fx, gx, gradf, proxg, params):
     print_end_message(method_name, time.time() - tic)
     return x, info
 
+
 def reconstruct_l1(image, indices, optimizer, params):
     # Wavelet operator
     r = RepresentationOperator(m=params["m"])
 
     # Define the overall operator
-    forward_operator = lambda x: p_omega(r.WT(x), indices)                  # P_Omega.W^T
-    adjoint_operator = lambda x: r.W(p_omega_t(x, indices, params['m']))    # W. P_Omega^T
+    forward_operator = lambda x: p_omega(r.WT(x), indices)  # P_Omega.W^T
+    adjoint_operator = lambda x: r.W(p_omega_t(x, indices, params['m']))  # W. P_Omega^T
 
     # Generate measurements
     b = p_omega(image.reshape(params['N'], 1), indices)
@@ -71,8 +72,8 @@ def reconstruct_TV(image, indices, optimizer, params):
         params:
     """
     # Define the overall operator
-    forward_operator = lambda x: p_omega(x, indices)                # P_Omega
-    adjoint_operator = lambda x: p_omega_t(x, indices, params['m']) # P_Omega^T
+    forward_operator = lambda x: p_omega(x, indices)  # P_Omega
+    adjoint_operator = lambda x: p_omega_t(x, indices, params['m'])  # P_Omega^T
 
     # Generate measurements
     b = forward_operator(image.reshape(params['N'], 1))
@@ -83,9 +84,22 @@ def reconstruct_TV(image, indices, optimizer, params):
                                               weight=params["lambda"] * y, eps=1e-5,
                                               n_iter_max=50).reshape((params['N'], 1))
     gradf = lambda x: adjoint_operator(forward_operator(x) - b).reshape(params['N'], 1)
-    
+
     x, info = optimizer(fx, gx, gradf, proxg, params)
     return x.reshape((params['m'], params['m'])), info
+
+
+def plot_best_worst(image, im_us, recons, psnr, reg):
+    _, ax = plt.subplots(1, 4, figsize=(20, 5))
+    ax[0].imshow(image, cmap='gray')
+    ax[0].set_title('Original')
+    ax[1].imshow(im_us, cmap='gray')
+    ax[1].set_title('Original with missing pixels')
+    ax[2].imshow(recons[np.argmax(psnr)[0]], cmap='gray')
+    ax[2].set_title('Largest PSNR ' + reg)
+    ax[3].imshow(recons[np.argmin(psnr)[0]], cmap="gray")
+    ax[3].set_title('Lowest PSNR ' + reg)
+    plt.show()
 
 if __name__ == "__main__":
 
@@ -117,13 +131,13 @@ if __name__ == "__main__":
     # Perform parameter sweep #
     ###########################
     num_points = 50
-    lambdas = np.logspace(-5,1, num=num_points)
+    lambdas = np.logspace(-5, 1, num=num_points)
     psnr_l1 = np.zeros(num_points)
     psnr_tv = np.zeros(num_points)
 
     reconstruction_l1 = []
     reconstruction_tv = []
-    
+
     for i, lambda_ in enumerate(lambdas):
         params['lambda'] = lambda_
 
@@ -135,7 +149,6 @@ if __name__ == "__main__":
 
         psnr_tv[i] = psnr(image, reconstruction_tv)
 
-    
     colors = {'l1': 'red', 'tv': 'blue'}
 
     # Plot PSNR against lambda
@@ -149,25 +162,5 @@ if __name__ == "__main__":
     plt.show()
 
     # Plot best and worst images
-    fig, ax = plt.subplots(1, 4, figsize=(20,5))
-    ax[0].imshow(image, cmap='gray')
-    ax[0].set_title('Original')
-    ax[1].imshow(im_us, cmap='gray')
-    ax[1].set_title('Original with missing pixels')
-    ax[2].imshow(reconstruction_l1[np.argmax(psnr_l1)], cmap='gray')
-    ax[2].set_title('Largest PSNR L1')
-    ax[3].imshow(reconstruction_l1[np.argmin(psnr_l1)], cmap="gray")
-    ax[3].set_title('Lowest PSNR L1')
-    plt.show()
-
-    fig, ax = plt.subplots(1, 4, figsize=(20,5))
-    ax[0].imshow(image, cmap='gray')
-    ax[0].set_title('Original')
-    ax[1].imshow(im_us, cmap='gray')
-    ax[1].set_title('Original with missing pixels')
-    ax[2].imshow(reconstruction_l1[np.argmax(psnr_tv)], cmap='gray')
-    ax[2].set_title('Largest PSNR TV')
-    ax[3].imshow(reconstruction_l1[np.argmin(psnr_tv)], cmap="gray")
-    ax[3].set_title('Lowest PSNR TV')
-    plt.show()
-
+    plot_best_worst(image, im_us, reconstruction_l1, psnr_l1, 'L1')
+    plot_best_worst(image, im_us, reconstruction_tv, psnr_tv, 'TV')
