@@ -89,8 +89,9 @@ def FISTA(fx, gx, gradf, proxg, params):
             x = x_next
             t = t_next
 
-        if k == 3:
+        if k == 1:
             err_0 = np.linalg.norm(y_next - y)
+            print('err_0 is ', err_0)
 
         # Common update
         y = y_next
@@ -130,8 +131,6 @@ def plot_convergence(results, fs_star, ylabel):
         if key in results:
             num_iterations = len(results[key])
             k = np.array(range(0, num_iterations))
-            print(k)
-
             plt.plot(k, abs(results[key] - fs_star) / fs_star,
                      color=colors[key], lw=2, label=key)
 
@@ -200,13 +199,13 @@ if __name__ == "__main__":
     _, info_fista_restart = FISTA(fx, gx, gradf, proxg, params)
 
     params['restart_criterion'] = False
-    _, info_fista = ISTA(fx, gx, gradf, proxg, params)
+    _, info_fista = FISTA(fx, gx, gradf, proxg, params)
 
     results = {'ISTA': info_ista, 'FISTA': info_fista, 'FISTA-RESTART': info_fista_restart}
-    print(results)
     plot_convergence(results, params['F*'], r'$ |f(\mathbf{x}^k) - f^\star|  /  f^\star$')
 
     # Part (d): Plot relative error to F^natural
     x_nat = image.reshape(params['N'], 1)
     F_natural = fx(x_nat) + gx(x_nat)
     plot_convergence(results, F_natural, r'$ |f(\mathbf{x}^k) - f^\natural|  /  f^\natural$')
+
