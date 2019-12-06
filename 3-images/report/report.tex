@@ -183,13 +183,13 @@ For this reason, accelerated algorithms are specially suited in this case. As ex
 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=.9\textwidth]{img/convergence_l1.png}
+    \includegraphics[trim={2.5cm 0.5cm 3cm 0},clip, width=.9\textwidth]{img/convergence_l1.png}
     \caption{Convergence of $\ell_1$-regularized Logistic regression}
     \label{fig:conv_l1}
 \end{figure}
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=.9\textwidth]{img/convergence_l2.png}
+    \includegraphics[trim={2.5cm 0.5cm 3cm 0},clip, width=.9\textwidth]{img/convergence_l2.png}
     \caption{Convergence of $\ell_2$-regularized Logistic regression}
     \label{fig:conv_l2}
 \end{figure}
@@ -224,10 +224,10 @@ Figure \ref{fig:vis} depicts the feature matrices obtained by running FISTA with
 \begin{figure}[ht]
     \centering
     \begin{minipage}{.9\textwidth}
-        \includegraphics[width=\textwidth]{img/visual_l1.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 0},clip, width=\textwidth]{img/visual_l1.png}
     \end{minipage}
     \begin{minipage}{.9\textwidth}
-        \includegraphics[width=\textwidth]{img/visual_l2.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 0},clip,width=\textwidth]{img/visual_l2.png}
     \end{minipage}
     \caption{Visualization of the feature matrices}
     \label{fig:vis}
@@ -283,38 +283,33 @@ On the other hand, one can understand the Logistic Regression formulation as a o
     
     \begin{figure}[ht]
         \centering
-        \includegraphics[width=.6\textwidth]{img/lambda_sweep.png}
+        \includegraphics[trim={3cm 0.5cm 3cm 2cm},clip, width=.6\textwidth]{img/lambda_sweep.png}
         \caption{PSNR as a function of $\lambda$, the penalty parameter}
         \label{fig:lambda}
     \end{figure}
     
     \begin{figure}[ht]
         \centering
-        \includegraphics[width=\textwidth]{img/psnr_l1.png}
-        \includegraphics[width=\textwidth]{img/psnr_tv.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 2.8cm},clip,width=\textwidth]{img/psnr_l1.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 2.8cm},clip,width=\textwidth]{img/psnr_tv.png}
         \caption{Reconstructed images for $\ell_1$ and TV regularization with best and worst penalty}
         \label{fig:psnr_tv}
     \end{figure}
     \item
     \item
     
-    We can see the reconstruction obtained for both $\ell_1$ and TV regularization after 500 steps in Figures \ref{fig:rec_l1_500} and \ref{fig:rec_tv_500}, where apart from the original image and the original with missing pixels, we can see an error map of the reconstruction. In Figure \ref{fig:rec_nn}, the same results but for the unrolled proximal operator can be seen. Note that comparing the regularized methods, TV regularization obtains a better result in terms of the PSNR, the SSIM and also the time. Nevertheless, when compared with the neural network, even if the SSIM is the same, this latter has a slightly larger PSNR and the time to obtain the reconstruction is much lower. Nevertheless, the time accounts for the inference and not for the computation of the unrolled proximal model.
+    We can see the reconstruction obtained for both $\ell_1$ and TV regularization after 500 steps in Figure \ref{fig:rec_500}, where apart from the original image and the original with missing pixels, we can see an error map of the reconstruction. In Figure \ref{fig:rec_nn}, the same results but for the unrolled proximal operator can be seen. Note that comparing the regularized methods, TV regularization obtains a better result in terms of the PSNR, the SSIM and also the time. Nevertheless, when compared with the neural network, even if the SSIM is the same, this latter has a slightly larger PSNR and the time to obtain the reconstruction is much lower. Nevertheless, the time accounts for the inference and not for the computation of the unrolled proximal model.
     
     \begin{figure}[ht]
         \centering
-        \includegraphics[width=\textwidth]{img/reconstruction_l1.png}
-        \caption{Reconstruction with $\ell_1$-regularization and 500 iterations}
-        \label{fig:rec_l1_500}
-    \end{figure}
-    \begin{figure}[ht]
-        \centering
-        \includegraphics[width=\textwidth]{img/reconstruction_tv.png}
-        \caption{Reconstruction with TV-regularization and 500 iterations}
-        \label{fig:rec_tv_500}
+        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/reconstruction_l1.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/reconstruction_tv.png}
+        \caption{Reconstruction with $\ell_1$ and TV-regularization and 500 iterations}
+        \label{fig:rec_500}
     \end{figure}[ht]
     \begin{figure}
         \centering
-        \includegraphics[width=\textwidth]{img/reconstruction_nn.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/reconstruction_nn.png}
         \caption{Reconstruction using the trained unrolled proximal operator}
         \label{fig:rec_nn}
     \end{figure}
@@ -323,9 +318,9 @@ On the other hand, one can understand the Logistic Regression formulation as a o
     
     \begin{figure}[ht]
         \centering
-        \includegraphics[width=\textwidth]{img/l1_5.png}
-        \includegraphics[width=\textwidth]{img/tv_5.png}
-        \includegraphics[width=\textwidth]{img/nn_5.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/l1_5.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/tv_5.png}
+        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/nn_5.png}
         \caption{Reconstructions using 5 iterations}
         \label{fig:5}
     \end{figure}
