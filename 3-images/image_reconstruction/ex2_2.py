@@ -95,9 +95,9 @@ def plot_best_worst(image, im_us, recons, psnr, reg):
     ax[0].set_title('Original')
     ax[1].imshow(im_us, cmap='gray')
     ax[1].set_title('Original with missing pixels')
-    ax[2].imshow(recons[np.argmax(psnr)[0]], cmap='gray')
+    ax[2].imshow(recons[np.argmax(psnr)], cmap='gray')
     ax[2].set_title('Largest PSNR ' + reg)
-    ax[3].imshow(recons[np.argmin(psnr)[0]], cmap="gray")
+    ax[3].imshow(recons[np.argmin(psnr)], cmap="gray")
     ax[3].set_title('Lowest PSNR ' + reg)
     plt.show()
 
@@ -143,11 +143,11 @@ if __name__ == "__main__":
 
         reconstruction_l1.append(reconstruct_l1(image, indices, FISTA, params)[0])
 
-        psnr_l1[i] = psnr(image, reconstruction_l1)
+        psnr_l1[i] = psnr(image, reconstruction_l1[-1])
 
         reconstruction_tv.append(reconstruct_TV(image, indices, FISTA, params)[0])
 
-        psnr_tv[i] = psnr(image, reconstruction_tv)
+        psnr_tv[i] = psnr(image, reconstruction_tv[-1])
 
     colors = {'l1': 'red', 'tv': 'blue'}
 
