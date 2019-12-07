@@ -189,7 +189,7 @@ if __name__ == "__main__":
     gx = lambda x: params['lambda'] * np.linalg.norm(x, ord=1)
     proxg = lambda x, y: l1_prox(x, params['lambda'] * y)
     gradf = lambda x: adjoint_operator(forward_operator(x) - b)
-
+    
     # Part (b): Compute F*
     x, info = FISTA(fx, gx, gradf, proxg, params)
     params['F*'] = info[-1]
@@ -206,9 +206,9 @@ if __name__ == "__main__":
 
     results = {'ISTA': info_ista, 'FISTA': info_fista, 'FISTA-RESTART': info_fista_restart}
     plot_convergence(results, params['F*'], r'$ |F(\mathbf{x}^k) - F^\star|  /  F^\star$')
-
+    
     # Part (d): Plot relative error to F^natural
-    x_nat = image.reshape(params['N'], 1)
+    x_nat = r.W(image.reshape(params['N'], 1))
     F_natural = fx(x_nat) + gx(x_nat)
     plot_convergence(results, F_natural, r'$ |F(\mathbf{x}^k) - F^\natural|  /  F^\natural$')
 
