@@ -20,17 +20,17 @@
     \end{align}
     and the maximum likelihood estimator of $X$ is given by
     \begin{align}
-        \hat{X}_{ML} \in \argmax_X \{ \ell(X) \} = \argmin_X \left\lbrace -\ell(X) = \sum_{i=1}^{n} \left( \log \sum_{k=1}^{C} e^{\aa_i^T \xx_{k}} - \aa_i^T \xx_{b_i} \right) := f(X) \right\rbrace
+        \hat{X}_{ML} \in \argmax_X \{ \ell(X) \} = \argmin_X \left\lbrace -\ell(X) := \sum_{i=1}^{n} \left( \log \sum_{k=1}^{C} e^{\aa_i^T \xx_{k}} - \aa_i^T \xx_{b_i} \right) =: f(X) \right\rbrace
     \end{align}
     
-    \item
+    \item Following the proposed notation, the $i-$th column of matrix $X$ is denoted as $\xx_i$. We can write the gradient of $X$ as
     \begin{align}
         \nabla_X f(X) = [\nabla_{\xx_1} f(X), \cdots, \nabla_{\xx_C} f(X)]
     \end{align}
     
     Let's find the value of this gradient at one of the columns, namely $j$
     \begin{align}
-        \nabla_{\xx_j} f(X) = \sum_{i=1}^{n} \left( \frac{\aa_i e^{\aa_i^T \xx_{j}} }{ \sum_{k=1}^{C} e^{\aa_i^T \xx_{k}}} - \aa_i \ind{b_i = j}\right)
+        \nabla_{\xx_j} f(X) = \sum_{i=1}^{n} \left( \frac{\aa_i e^{\aa_i^T \xx_{j}} }{ \sum_{k=1}^{C} e^{\aa_i^T \xx_{k}}} - \aa_i \ind{b_i = j}\right)=\sum_{i=1}^{n}\aa_i  \left( \frac{e^{\aa_i^T \xx_{j}} }{ \sum_{k=1}^{C} e^{\aa_i^T \xx_{k}}} - \ind{b_i = j}\right)
     \end{align}
     
     In matrix notation, we can write
@@ -45,7 +45,7 @@
         \end{cases},
     \end{align*}
     $Y\in \{0,1\}^{n\times C}$ is a matrix whose rows are the one-hot encoding of $b_i$ and $\text{exp}$ is applied entry-wise.
-    \item Proving that $f$ is convex is equivalent to showing that its Hessian is PSD.
+    \item Proving that $f$ is convex is equivalent to showing that its Hessian is PSD. The hessian of $f$ has the form
     \begin{align}
         \nabla^2 f(X) = \sum_{i=1}^{n} \Sigma_i \otimes \aa_i \aa_i^T
     \end{align}
@@ -64,6 +64,7 @@
         \zz^T (D + E) \zz = \zz^T D \zz + \zz^T E \zz \geq \zz^T E \zz \geq 0\quad \forall \zz \Longleftrightarrow D+E \succeq 0
         \label{eq:sum_psd}
     \end{align}
+    where the inequalities follow from positive semidefiniteness of $D$ and $E$ respectively.
 
     Note that $\aa_i \aa_i^T$ is indeed PSD, since
     \begin{align}
@@ -73,7 +74,7 @@
     
     Finally, to show that $\Sigma_i$ is also PSD, note that $\Sigma_i = \Lambda - \mathbf{s}_i \mathbf{s}_i^T $ with $\mathbf{s}_i =[\sigma_{i1},\dots, \sigma_{iC}]^T$ and $\Lambda=\text{diag}(\mathbf{s}_i)$. By definition of positive semidefiniteness,
     \begin{align}
-        \zz^T \Sigma_i \zz &= \zz^T (\Lambda - \mathbf{s}_i \mathbf{s}_i^T)\zz = \zz^T \Lambda \zz - |\lin{\mathbf{s}_i, \zz}|^2 \\
+        \zz^T \Sigma_i \zz &= \zz^T (\Lambda - \mathbf{s}_i \mathbf{s}_i^T)\zz = \zz^T \Lambda \zz - \norm{\mathbf{s}_i^T \zz}^2 \\
         &:= \sum_{j=1}^{C} z_j^2 \sigma_{ij} - \left(\sum_{j=1}^{C} z_j \sigma_{ij}\right)^2 \\
         &\geq \sum_{j=1}^{C} z_j^2 \sigma_{ij} - \sum_{j=1}^{C} \left( z_j \sigma_{ij}\right)^2 &&\text{by convexity of $(\cdot)^2$}\\
         &= \sum_{j=1}^{C} z_j^2 (\sigma_{ij} - \sigma_{ij}^2) \geq \sum_{j=1}^{C} z_j^2 &&\text{since $0\leq \sigma_{ij} \leq 1$}\\
@@ -81,18 +82,29 @@
     \end{align}
     
     The proof concludes by applying Fact \ref{fact1} to show that $\Sigma_i \otimes \aa_i \aa_i^T \succeq 0 \quad \forall i$ and by again applying \eqref{eq:sum_psd} $n$ times to show $\sum_i \Sigma_i + \aa_i \aa_i^T \succeq 0$.
-    \item We can upperbound the largest eigenvalue of the matrix $\aa_i \aa_i^T$ as
+    \item We can upperbound the largest eigenvalue of the matrix $\aa_i \aa_i^T$ by expressing it as a maximization problem
     \begin{align}
-        \lambda_{\max} (\aa_i \aa_i^T) &= \max_{\xx \in \R^n} \frac{\xx^T \aa_i \aa_i^T \xx}{\xx^T \xx} = \max_{\xx \in \R^n}\frac{\xx^T \aa_i \aa_i^T \xx}{\xx^T \xx} = \max_{\xx \in \R^n}\frac{\lin{\xx, \aa_i}^2}{\norm{\xx}^2} \\
-        &\leq \max_{\xx \in \R^n} \frac{\norm{\xx}^2 \norm{\aa_i}^2}{\norm{\xx}^2}  = \norm{\aa_i}^2
+        \lambda_{\max} (\aa_i \aa_i^T) &= \max_{\xx \in \R^n\setminus\{\0\}} \frac{\xx^T \aa_i \aa_i^T \xx}{\xx^T \xx} = \max_{\xx \in \R^n\setminus\{\0\}}\frac{\xx^T \aa_i \aa_i^T \xx}{\xx^T \xx} = \max_{\xx \in \R^n\setminus\{\0\}}\frac{\lin{\xx, \aa_i}^2}{\norm{\xx}^2} \\
+        &\leq \max_{\xx \in \R^n\setminus\{\0\}} \frac{\norm{\xx}^2 \norm{\aa_i}^2}{\norm{\xx}^2}  = \norm{\aa_i}^2
     \end{align}
     where inequality follows from Cauchy-Schwarz.
     
-    For the matrix $\Sigma_i$, we can use the inequality
+    \begin{fact}
+        Given $D\succeq 0$, we have that
+        \begin{align}
+            \lambda_{\max} (D)\leq \max_i \sum_j |D_{ij}|
+        \end{align}
+        that is, the top eigenvalue is upper-bounded by the maximum $\ell_1$ norm of rows.
+        \label{fact2a}
+    \end{fact}
+    
+    Using Fact \ref{fact2a} for the PSD matrix $\Sigma_i$, yields
     \begin{align}
-        \lambda_{\max} (\Sigma_i) \leq \max_j \sum_{k=1}^C |\Sigma_{i_{jk}}| = \max_j \sum_{k=1}^C |\Sigma_{i_{jk}}| = \max_j \sigma_{ij} \left[(1-\sigma_{ij})+\sum_{k=1, k\neq j}^C \sigma_{ik} \right]
+        \lambda_{\max} (\Sigma_i) \leq \max_j \sum_{k=1}^C |\Sigma_{i_{jk}}|  = \max_j \sigma_{ij} \left[(1-\sigma_{ij})+\sum_{k=1, k\neq j}^C \sigma_{ik} \right]
     \end{align}
-    where I use $1 \geq \sigma_{ij} \geq 0 \quad \forall i,j \in \{1,\dots, C\}$. Note that $1-\sigma_{ij}=\sum_{k=1, k\neq j}^C \sigma_{ik}$ so
+    where I use $1 \geq \sigma_{ij} \geq 0 \quad \forall i,j \in \{1,\dots, C\}$ to get rid of the absolute value.
+    
+    Note that $1-\sigma_{ij}=\sum_{k=1, k\neq j}^C \sigma_{ik}$ since $\sum_k \sigma_{ik}=1\ \forall i$, so
     \begin{align}
         \lambda_{\max} (\Sigma_i) \leq \max_j 2 \sigma_{ij} (1-\sigma_{ij}) \leq \frac{1}{2}
     \end{align}
@@ -118,13 +130,14 @@
     \begin{proof}
         We can express the maximum eigenvalue of the matrix $A+B$ as
         \begin{align}
-            \lambda_{\max}(A+B)=\max_{\xx \in \R^n }\frac{\xx ^T (A+B)\xx}{\norm{\xx}^2} \leq \max_{\xx \in \R^n }\frac{\xx ^T A\xx}{\norm{\xx}^2}+\max_{\xx \in \R^n }\frac{\xx ^T B\xx}{\norm{\xx}^2}=\lambda_{\max}(A)+\lambda_{\max}(B)
+            \lambda_{\max}(A+B)&=\max_{\xx \in \R^n\setminus\{\0\} }\frac{\xx ^T (A+B)\xx}{\norm{\xx}^2} \leq \max_{\xx \in \R^n \setminus\{\0\}}\frac{\xx ^T A\xx}{\norm{\xx}^2}+\max_{\xx \in \R^n\setminus\{\0\} }\frac{\xx ^T B\xx}{\norm{\xx}^2}\\
+            &=\lambda_{\max}(A)+\lambda_{\max}(B)
         \end{align}
     \end{proof}
     
     Finally, applying Lemma \ref{lemma:1} $n-1$ times,
     \begin{align}
-        \lambda_{\max}(\nabla^2 f) \leq \sum_{i=1}^n \frac{\norm{\aa_i}^2}{2} := \frac{\norm{A}^2_F}{2}=L
+        \lambda_{\max}(\nabla^2 f) \leq \sum_{i=1}^n \frac{\norm{\aa_i}^2}{2} =: \frac{\norm{A}^2_F}{2}=:L
     \end{align}
     
     \item For $g(\xx):=\norm{\xx}_1$,
@@ -173,23 +186,25 @@
 \subsection*{Part II - Handwritten Digit Classification}
 
 \subsubsection*{Discussion of the convergence plots}
-As we can see in Figures \ref{fig:conv_l1} and \ref{fig:conv_l2}, the convergence with ISTA algorithm is very slow for both $\ell_1$ and $\ell_2$ regularized logistic regression. Note that for the latter case it offers the poorest performance.
+As we can see in Figures \ref{fig:conv_l1} and \ref{fig:conv_l2}, the convergence with ISTA algorithm is very slow for both $\ell_1$ and $\ell_2$ regularized logistic regression. Note that for the latter case it offers the poorest performance among all the tested algorithms.
 
-Regarding the Stochastic Proximal method, we observe a flat behavior for the $\ell_1$ regularization and a better performance that the deterministic ISTA algorithm for $\ell_2$ regularization. Differently from the deterministic algorithms, the x axis of the stochastic plot is the number of epochs, so it would correspond to one iteration of a deterministic method. Hence, \texttt{PROX-SG} has effectively half as many iterations as the deterministic methods.
+Regarding the Stochastic Proximal method, we observe a flat behavior for the $\ell_1$ regularization and a better performance than the deterministic ISTA algorithm for $\ell_2$ regularization. Differently from the deterministic algorithms, the x axis of the stochastic plot is the number of epochs, so it would correspond to one iteration of a deterministic method. Hence, \texttt{PROX-SG} has effectively half as many iterations as the deterministic methods.
 
-Note that the previous algorithms offer a very slow convergence since the step size is chosen to be the Lipschitz constant of the gradients for each of the problems. This is of the order of $10^5$, hence the resulting step size is $10^{-5}$ which explains the flat behavior of the convergence curves.
+Note that the previous algorithms offer a very slow convergence since the step size is chosen to be the Lipschitz constant of the gradients for each of the problems. This is of the order of $10^5$, hence the resulting step size is order $10^{-5}$, which explains the flat behavior of the convergence curves.
 
-For this reason, accelerated algorithms are specially suited in this case. As expected, FISTA performs better than any other algorithm for these problems and its restarted version is equivalent until the occurrence of the first ripple. By construction, the restarted version is monotonically decreasing and converges faster in the number of iterations.
+For this reason, accelerated algorithms are specially suited in this case. As expected, FISTA performs better than any other algorithm for these problems and its restarted version is equivalent until the occurrence of the first ripple. By construction, the restarted version avoids the oscillatory behavior of accelerated algorithms and converges faster in the number of iterations. Nevertheless, the restarted version has a higher computational cost per iteration since it has to compute additional updates when the restart condition is satisfied. We can see that for $\ell_1$ regularization (Figure \ref{fig:conv_l1}), it's not worth incorporating the restart condition.
+
+In the case of $\ell_2$ regularization (Figure \ref{fig:conv_l2}), we can see that the oscillatory behavior characteristic of accelerated methods is much more significant. Hence, the restarted version of FISTA would be preferred since, even if it takes more time to perform the same number of iterations, it achieves an objective value several orders of magnitude closer than without restart.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[trim={2.5cm 0cm 1cm 0},clip, width=.9\textwidth]{img/convergence_l1.png}
+    \includegraphics[trim={0cm 0cm 1cm 0},clip, width=.9\textwidth]{img/convergence_l1.png}
     \caption{Convergence of $\ell_1$-regularized Logistic regression}
     \label{fig:conv_l1}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[trim={2.5cm 0cm 1.5cm 0},clip, width=.9\textwidth]{img/convergence_l2.png}
+    \includegraphics[trim={0 0cm 1.5cm 0},clip, width=.9\textwidth]{img/convergence_l2.png}
     \caption{Convergence of $\ell_2$-regularized Logistic regression}
     \label{fig:conv_l2}
 \end{figure}
@@ -219,26 +234,26 @@ where $R_0 = \norm{\xx_0 - \xx^*}$. These bounds are depicted as dashed lines in
 \end{figure}
 
 \subsubsection*{Digit features}
-Figure \ref{fig:vis} depicts the feature matrices obtained by running FISTA with gradient restart. Specially for the case of $\ell_2$ regularization, we can see similarities between each class and the depicted values. This can be easily seen for classes 0 and 1.
+Figures \ref{fig:vis_1} and \ref{fig:vis_2} depict the feature matrices obtained by running FISTA with gradient restart. Specially for the case of $\ell_2$ regularization (Figre \ref{fig:vis_2}), we can see similarities between each class and the depicted values. This can be easily seen for classes 0, 1 and 3.
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{.9\textwidth}
-        \includegraphics[trim={.5cm .5cm .5cm 0},clip, width=\textwidth]{img/visual_l1.png}
-    \end{minipage}
-    \begin{minipage}{.9\textwidth}
-        \includegraphics[trim={.5cm .5cm .5cm 0},clip,width=\textwidth]{img/visual_l2.png}
-    \end{minipage}
-    \caption{Visualization of the feature matrices}
-    \label{fig:vis}
+        \includegraphics[trim={.5cm .5cm .5cm 2.5cm},clip, width=\textwidth]{img/visual_l1.png}
+         \caption{Visualization of the feature matrices for $\ell_1-$regularized Logistic Regression}
+    \label{fig:vis_1}
+\end{figure}
+\begin{figure}[H]
+        \includegraphics[trim={.5cm .5cm .5cm 2.5cm},clip,width=\textwidth]{img/visual_l2.png}
+    \caption{Visualization of the feature matrices for $\ell_2-$regularized Logistic Regression}
+    \label{fig:vis_2}
 \end{figure}
 
 \subsubsection*{Comparison against Neural Network}
 The test accuracies of both regularization versions of the Logistic Regression formulation are presented in Table \ref{tab:acc} along the test accuracy of a Neural Network. The tested model for Logistic regression is the one obtained by FISTA with gradient scheme restart for both $\ell_1$ and $\ell_2$ regularization, while the Neural Network is a 3-layer perceptron with ReLU activation functions.
 
-As seen in Table \ref{tab:acc}, one can intuit that the Logistic Regression model has not as many expressive power as the Neural Network. The universal approximation theorem states that a 1-hidden-layer Neural Network with enough hidden units and a non-polynomial activation function can approximate a continuous function arbitrarily well. The theorem may not hold by the \textit{enough hidden units} condition, the same reasoning applies. Nevertheless, in this case we don't have a wide Neural Network but a one deeper that only one layer which increments the expressive power.
+As seen in Table \ref{tab:acc}, one can intuit that the Logistic Regression model has not as many expressive power as the Neural Network. The universal approximation theorem states that a 1-hidden-layer Neural Network with enough hidden units and a non-polynomial activation function can approximate a continuous function arbitrarily well. The theorem may not hold by the \textit{enough hidden units} condition, the same reasoning applies. Nevertheless, in this case we don't have a wide Neural Network but a one deeper that only one layer, which potentially increments the expressive power.
 
-On the other hand, one can understand the Logistic Regression formulation as a one-layer neural network, i.e. no hidden layers, and with softmax activation function. Note that this activation function is continuous and can be arbitrarily well approximated using a Taylor series and there is no hidden layer. So in any case the general approximation theorem holds in this case.
+On the other hand, one can understand the Logistic Regression formulation as a one-layer neural network, i.e. no hidden layers, and with softmax activation function. Note that this activation function has no discontinuities and can be arbitrarily well approximated using a Taylor series. Moreover, in this case there is no hidden layer. In conclusion, in any case the general approximation theorem holds for Logistic Regression.
 
 \begin{table}[H]
     \centering
@@ -263,21 +278,22 @@ On the other hand, one can understand the Logistic Regression formulation as a o
         \end{align}
         
         \begin{align}
-            \nabla_{\xx}f(\xx) := \nabla_{\xx} \left\lbrace \frac{1}{2}\norm{\bb - P_{\Omega} \xx}_2^2 + \lambda_{\text{TV}}\norm{\xx}_{\text{TV}} \right\rbrace = P_{\Omega}^T (P_{\Omega} \xx - \bb) 
+            \nabla_{\xx}f(\xx) := \nabla_{\xx} \left\lbrace \frac{1}{2}\norm{\bb - P_{\Omega} \xx}_2^2 \right\rbrace = P_{\Omega}^T (P_{\Omega} \xx - \bb) 
         \end{align}
         \item 
         \begin{align}
             \norm{\nabla_{\boldsymbol{\alpha}}f(\boldsymbol{\alpha}) - \nabla_{\boldsymbol{\alpha}}f(\boldsymbol{\beta})} &= \norm{W P_{\Omega}^T P_{\Omega} W^T(\boldsymbol{\alpha} - \boldsymbol{\beta})} \leq \norm{W P_{\Omega}^T P_{\Omega} W^T} \norm{\boldsymbol{\alpha} - \boldsymbol{\beta}} \\
-            &:= L_{\ell_1} \norm{\boldsymbol{\alpha} - \boldsymbol{\beta}} \leq L \norm{\xx - \yy}
+            &:= L_{\ell_1} \norm{\boldsymbol{\alpha} - \boldsymbol{\beta}}
         \end{align}
-        where the first inequality follows by definition of the spectral norm. 
+        where the inequality follows by definition of the spectral norm. 
         
         \begin{align}
-            \norm{\nabla_{\xx} f(\xx) - \nabla_{\xx} f(\yy)} = \norm{P_{\Omega} ^TP_{\Omega} (\xx - \yy)} \leq \norm{P_{\Omega} ^TP_{\Omega}}\norm{\xx - \yy} := L_{TV}\norm{\xx - \yy} \leq L \norm{\xx - \yy}
+            \norm{\nabla_{\xx} f(\xx) - \nabla_{\xx} f(\yy)} = \norm{P_{\Omega} ^TP_{\Omega} (\xx - \yy)} \leq \norm{P_{\Omega} ^TP_{\Omega}}\norm{\xx - \yy} := L_{TV}\norm{\xx - \yy}
         \end{align}
     
-    A valid upper bound in both cases is $L=1$, which follows by noting that $P_{\Omega}$ is a projection that selects some coordinates without altering its values and the Wavelet transform defines an orthonormal basis. In summary, both the matrices $P_{\Omega}^T P_{\Omega}$ and $W P_{\Omega}^T P_{\Omega} W^T$ will be diagonal with entries 1 in those coordinates selected by $P_{\Omega}$ and 0 otherwise. Hence, it's trivial to see that the maximum eigenvalue (and thus the spectral norm of these matrices) will be 1.
+    A valid upper bound in both cases is $L_{\ell_1}=L_{TV}=1$, which follows by noting that $P_{\Omega}$ is a projection that selects some coordinates without altering its values and the Wavelet transform defines an orthonormal basis. In summary, both the matrices $P_{\Omega}^T P_{\Omega}$ and $W P_{\Omega}^T P_{\Omega} W^T$ will be diagonal with entries 1 in those coordinates selected by $P_{\Omega}$ and 0 otherwise. Hence, it's trivial to see that the maximum eigenvalue (and thus the spectral norm of these matrices) will be 1 in both cases.
     \end{enumerate}
+    
     \item 
     A parameter sweep over $\lambda_1$ and $\lambda_{\text{TV}}$ is depicted in Figure \ref{fig:lambda} against the Peak signal-to-noise ratio (PSNR) of the reconstructed image taking the original one as a reference. Each reconstruction has been obtained by running 200 iterations of FISTA. The higher the PSNR the better, and this can be seen in Figure \ref{fig:psnr_tv}.
     
@@ -295,24 +311,27 @@ On the other hand, one can understand the Logistic Regression formulation as a o
         \caption{Reconstructed images for $\ell_1$ and TV regularization with best and worst penalty}
         \label{fig:psnr_tv}
     \end{figure}
+    
+    
+    \item When analyzing the convergence for $\ell_1$ regularization, we can see that again the FISTA with restart is the best method among the tested ones. The evolution towards the solution of this problem is depicted in Figure \ref{fig:f_star}. Note that the solution to the problem formulation is not necessarily the same as the original image without missing pixels. Indeed, this can be seen in \ref{fig:f_nat}. Given that $F$ evaluated at the original image is very large and for each iteration we are decreasing the value of $F$, we are moving away. This explains the plot with increasing relative absolute error of Figure \ref{fig:f_nat}.
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{img/against_f_star.png}
+        \caption{Relative absolute error against $F^*=28.18$}
+        \label{fig:f_star}
+    \end{figure}
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{img/against_f_nat.png}
+        \caption{Relative absolute error against $F^\natural = 5835.05$}
+        \label{fig:f_nat}
+    \end{figure}
+    
     \item
     
-    \begin{table}[H]
-    \centering
-    \begin{tabular}{cc}
-        \toprule
-        $F^*$ & $F^\natural$\\
-        \midrule
-        28.18 & 5835.05 \\
-        \bottomrule
-    \end{tabular}
-    \caption{Comparison between Optimal value of the problem vs. Real value of the solution}
-    \label{tab:F_val}
-\end{table}
-    
-    \item
-    
-    We can see the reconstruction obtained for both $\ell_1$ and TV regularization after 500 steps in Figure \ref{fig:rec_500}, where apart from the original image and the original with missing pixels, we can see an error map of the reconstruction. In Figure \ref{fig:rec_nn}, the same results but for the unrolled proximal operator can be seen. Note that comparing the regularized methods, TV regularization obtains a better result in terms of the PSNR, the SSIM and also the time. Nevertheless, when compared with the neural network, even if the SSIM is the same, this latter has a slightly larger PSNR and the time to obtain the reconstruction is much lower. Nevertheless, the time accounts for the inference and not for the computation of the unrolled proximal model.
+    We can see the reconstruction obtained for both $\ell_1$ and TV regularization after 500 steps in Figure \ref{fig:rec_500}, where apart from the original image and the original with missing pixels, an error map of the reconstruction is depicted. In Figure \ref{fig:rec_nn}, the same results but for the unrolled proximal operator can be seen. Note that comparing the regularized methods, TV regularization obtains a better result in terms of the PSNR, the SSIM and also the time. Nevertheless, when compared with the neural network, even if the SSIM is the same, this latter has a slightly larger PSNR and the time to obtain the reconstruction is much lower. Nevertheless, the time accounts for the inference and not for the computation of the unrolled proximal model.
     
     \begin{figure}[H]
         \centering
@@ -320,15 +339,15 @@ On the other hand, one can understand the Logistic Regression formulation as a o
         \includegraphics[trim={.5cm .5cm .5cm 0cm},clip,width=\textwidth]{img/reconstruction_tv.png}
         \caption{Reconstruction with $\ell_1$ and TV-regularization and 500 iterations}
         \label{fig:rec_500}
-    \end{figure}[H]
-    \begin{figure}
+    \end{figure}
+    \begin{figure}[H]
         \centering
         \includegraphics[trim={.5cm .5cm .5cm 0cm},clip,width=\textwidth]{img/reconstruction_nn.png}
         \caption{Reconstruction using the trained unrolled proximal operator}
         \label{fig:rec_nn}
     \end{figure}
     
-    For a fair comparison, Figure \ref{fig:5} show the results with only 5 iterations for the three methods considered before. Note that each iteration of the Neural Network costs roughly 200 times more that with the least squares problem formulation with either $\ell_1$ or TV regularization. These achieve very similar performance for only 5 iterations and are comparable with the trained unrolled proximal operator with 500 iterations, which still take less than half the time for five iterations of the Neural Network. Therefore, one would probably prefer TV regularization as the in-painting method.
+    For a fair comparison, Figure \ref{fig:5} shows the results with only 5 iterations for the three methods considered before. Note that each iteration of the Neural Network costs roughly 200 times more than with the least squares problem formulation with either $\ell_1$ or TV regularization. These achieve very similar performance for only 5 iterations and are comparable with the trained unrolled proximal operator with 500 iterations, which still take less than half the time needed to perform five iterations of the Neural Network. Therefore, one would probably prefer TV regularization as the in-painting method for the minor improvements with the Neural Network and the time it takes to fully train this model.
     
     \begin{figure}[H]
         \centering
