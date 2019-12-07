@@ -313,19 +313,31 @@ On the other hand, one can understand the Logistic Regression formulation as a o
     \end{figure}
     
     
-    \item When analyzing the convergence for $\ell_1$ regularization, we can see that again the FISTA with restart is the best method among the tested ones. The evolution towards the solution of this problem is depicted in Figure \ref{fig:f_star}. Note that the solution to the problem formulation is not necessarily the same as the original image without missing pixels. Indeed, this can be seen in \ref{fig:f_nat}. Given that $F$ evaluated at the original image is very large and for each iteration we are decreasing the value of $F$, we are moving away. This explains the plot with increasing relative absolute error of Figure \ref{fig:f_nat}.
+    \item When analyzing the convergence for $\ell_1$ regularization for the image in-painting problem, we can see that again the FISTA with restart is the best method among the tested ones. The evolution towards the solution of this problem, the minimization of $F$, is depicted in Figure \ref{fig:f_star}. Note that the solution to the problem formulation is not necessarily the same as the ground-truth image, that is the image without missing pixels. Indeed, this can be seen in \ref{fig:f_nat}. To understand this, recall that the function to minimize in this problem is defined as
+    \begin{align}
+        F(\boldsymbol{\alpha}) := \underbrace{\frac{1}{2}\norm{\bb - P_{\Omega} W^T \boldsymbol{\alpha}}^2_2}_{f_{\ell_1}(\boldsymbol{\alpha})} + \underbrace{\lambda_{\ell_1} \norm{\boldsymbol{\alpha}}_1}_{g_{\ell_1}(\boldsymbol{\alpha})}
+    \end{align}
+    where $\bb = P_{\Omega} \xx^\natural$ and $\boldsymbol{\alpha}$ represents the Wavelet coefficients of the evaluated image. Let $\boldsymbol{\alpha}^\natural$ be the Wavelet transform of the ground-truth image.
+    
+    \begin{align}
+        F(\boldsymbol{\alpha}^\natural) &:= \frac{1}{2}\norm{\bb - P_{\Omega} W^T \boldsymbol{\alpha}^\natural}^2_2 + \lambda_{\ell_1} \norm{\boldsymbol{\alpha}^\natural}_1 := \frac{1}{2}\norm{P_\Omega \xx^\natural - P_{\Omega} W^T W \xx^\natural}^2_2 + \lambda_{\ell_1} \norm{W \xx^\natural}_1 \\
+        &= \lambda_{\ell_1} \norm{W \xx^\natural}_1 
+    \end{align}
+    where the last inequality follows since the Wavelet transform defines an orthonormal basis, i.e. $W^T W= I$.
+    
+    Note that for the ground-truth image, the term $f_{\ell_1}$ is zero, but the regularization term $g_{\ell_1}$ is not. Since we are minimizing the overall $F$, it is possible to obtain a lower objective value than the one with the ground-truth image. This explains the plot with increasing relative absolute error of Figure \ref{fig:f_nat}.
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{img/against_f_star.png}
+        \includegraphics[width=.9\textwidth]{img/against_f_star.png}
         \caption{Relative absolute error against $F^*=28.18$}
         \label{fig:f_star}
     \end{figure}
     
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{img/against_f_nat.png}
-        \caption{Relative absolute error against $F^\natural = 5835.05$}
+        \includegraphics[width=.9\textwidth]{img/against_f_nat.png}
+        \caption{Relative absolute error against $F^\natural = 34.92$}
         \label{fig:f_nat}
     \end{figure}
     
