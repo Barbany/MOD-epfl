@@ -33,6 +33,8 @@ def ISTA(fx, gx, gradf, proxg, params):
             print('Early stop')
             return x, info
 
+        if k % params['iter_print'] == 0:
+            print_progress(k, params['maxit'], F_x, fx(x), gx(x))
     return x, info
 
 
@@ -65,12 +67,12 @@ def FISTA(fx, gx, gradf, proxg, params):
 
         if params['restart_criterion']:
             y_next = x + theta * (1 / theta_prev - 1) * (x - x_prev)
-            x_next = proxg(y - alpha * gradf(y), alpha)
+            x_next = proxg(y_next - alpha * gradf(y_next), alpha)
 
-            if gradient_scheme_restart_condition(x, x_next, y):
+            if gradient_scheme_restart_condition(x, x_next, y_next):
                 theta = 1
-                y = x
-                x_next = proxg(y - alpha * gradf(y), alpha)
+                y_next = x
+                x_next = proxg(y_next - alpha * gradf(y_next), alpha)
 
             theta_next = (np.sqrt(theta ** 4 + 4 * theta ** 2) - theta ** 2) / 2
             # Update parameters
@@ -89,12 +91,8 @@ def FISTA(fx, gx, gradf, proxg, params):
             x = x_next
             t = t_next
 
-        if k == 1:
+        if err_0 is None and ~np.all(np.isclose(y_next, y)):
             err_0 = np.linalg.norm(y_next - y)
-            print('err_0 is ', err_0)
-
-        # Common update
-        y = y_next
 
         # Record convergence
         F_x = fx(x) + gx(x)
@@ -102,8 +100,13 @@ def FISTA(fx, gx, gradf, proxg, params):
 
         # Early stopping
         if stop({'F_x': F_x, 'y': y, 'y_next': y_next, 'err_0': err_0}, params):
-            print('Early stop')
             return x, info
+
+        # Common update
+        y = y_next
+
+        if k % params['iter_print'] == 0:
+            print_progress(k, params['maxit'], F_x, fx(x), gx(x))
 
     return x, info
 
@@ -137,7 +140,7 @@ def plot_convergence(results, fs_star, ylabel):
     plt.legend()
     plt.xlabel('#iterations')
     plt.ylabel(ylabel)
-    plt.ylim(1e-8, 1e6)
+    # plt.ylim(1e-8, 1e6)
     plt.yscale('log')
     plt.show()
 
@@ -202,10 +205,12 @@ if __name__ == "__main__":
     _, info_fista = FISTA(fx, gx, gradf, proxg, params)
 
     results = {'ISTA': info_ista, 'FISTA': info_fista, 'FISTA-RESTART': info_fista_restart}
-    plot_convergence(results, params['F*'], r'$ |f(\mathbf{x}^k) - f^\star|  /  f^\star$')
+    plot_convergence(results, params['F*'], r'$ |F(\mathbf{x}^k) - F^\star|  /  F^\star$')
 
     # Part (d): Plot relative error to F^natural
     x_nat = image.reshape(params['N'], 1)
     F_natural = fx(x_nat) + gx(x_nat)
-    plot_convergence(results, F_natural, r'$ |f(\mathbf{x}^k) - f^\natural|  /  f^\natural$')
+    plot_convergence(results, F_natural, r'$ |F(\mathbf{x}^k) - F^\natural|  /  F^\natural$')
 
+    print('The value of F* is ' + str(params['F*']))
+    print('The value of F^nat is ' + str(F_natural))
