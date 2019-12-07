@@ -181,15 +181,15 @@ Note that the previous algorithms offer a very slow convergence since the step s
 
 For this reason, accelerated algorithms are specially suited in this case. As expected, FISTA performs better than any other algorithm for these problems and its restarted version is equivalent until the occurrence of the first ripple. By construction, the restarted version is monotonically decreasing and converges faster in the number of iterations.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[trim={2.5cm 0.5cm 3cm 0},clip, width=.9\textwidth]{img/convergence_l1.png}
+    \includegraphics[trim={2.5cm 0cm 1cm 0},clip, width=.9\textwidth]{img/convergence_l1.png}
     \caption{Convergence of $\ell_1$-regularized Logistic regression}
     \label{fig:conv_l1}
 \end{figure}
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
-    \includegraphics[trim={2.5cm 0.5cm 3cm 0},clip, width=.9\textwidth]{img/convergence_l2.png}
+    \includegraphics[trim={2.5cm 0cm 1.5cm 0},clip, width=.9\textwidth]{img/convergence_l2.png}
     \caption{Convergence of $\ell_2$-regularized Logistic regression}
     \label{fig:conv_l2}
 \end{figure}
@@ -206,7 +206,7 @@ As mentioned in the previous section, the slow convergence is due to the large L
 \end{align}
 where $R_0 = \norm{\xx_0 - \xx^*}$. These bounds are depicted as dashed lines in Figure \ref{fig:theo}. Here we can see that, even if the convergence is in general very slow as discussed in the previous section, the empirical results are below the theoretical bounds, which have a large value due to the huge $L$ factor in \eqref{eq:theo}.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \begin{minipage}{.45\textwidth}
         \includegraphics[width=\textwidth]{img/l1_reg.png}
@@ -221,13 +221,13 @@ where $R_0 = \norm{\xx_0 - \xx^*}$. These bounds are depicted as dashed lines in
 \subsubsection*{Digit features}
 Figure \ref{fig:vis} depicts the feature matrices obtained by running FISTA with gradient restart. Specially for the case of $\ell_2$ regularization, we can see similarities between each class and the depicted values. This can be easily seen for classes 0 and 1.
 
-\begin{figure}[ht]
+\begin{figure}[H]
     \centering
     \begin{minipage}{.9\textwidth}
-        \includegraphics[trim={3.5cm 2cm 3cm 0},clip, width=\textwidth]{img/visual_l1.png}
+        \includegraphics[trim={.5cm .5cm .5cm 0},clip, width=\textwidth]{img/visual_l1.png}
     \end{minipage}
     \begin{minipage}{.9\textwidth}
-        \includegraphics[trim={3.5cm 2cm 3cm 0},clip,width=\textwidth]{img/visual_l2.png}
+        \includegraphics[trim={.5cm .5cm .5cm 0},clip,width=\textwidth]{img/visual_l2.png}
     \end{minipage}
     \caption{Visualization of the feature matrices}
     \label{fig:vis}
@@ -240,7 +240,7 @@ As seen in Table \ref{tab:acc}, one can intuit that the Logistic Regression mode
 
 On the other hand, one can understand the Logistic Regression formulation as a one-layer neural network, i.e. no hidden layers, and with softmax activation function. Note that this activation function is continuous and can be arbitrarily well approximated using a Taylor series and there is no hidden layer. So in any case the general approximation theorem holds in this case.
 
-\begin{table}[ht]
+\begin{table}[H]
     \centering
     \begin{tabular}{ccc}
         \toprule
@@ -276,19 +276,19 @@ On the other hand, one can understand the Logistic Regression formulation as a o
             \norm{\nabla_{\xx} f(\xx) - \nabla_{\xx} f(\yy)} = \norm{P_{\Omega} ^TP_{\Omega} (\xx - \yy)} \leq \norm{P_{\Omega} ^TP_{\Omega}}\norm{\xx - \yy} := L_{TV}\norm{\xx - \yy} \leq L \norm{\xx - \yy}
         \end{align}
     
-    A valid upper bound in both cases is $L=1$, which follows by noting that $P_{\Omega}$ is a projection that selects some coordinates without altering its values and the Wavelet transform defines an orthonormal basis. Summing up, both the matrices $P_{\Omega}^T P_{\Omega}$ and $W P_{\Omega}^T P_{\Omega} W^T$ will be diagonal with entries 1 in those coordinates selected by $P_{\Omega}$ and 0 otherwise. Hence, it's trivial to see that the maximum eigenvalue (and thus the spectral norm of these matrices) will be 1.
+    A valid upper bound in both cases is $L=1$, which follows by noting that $P_{\Omega}$ is a projection that selects some coordinates without altering its values and the Wavelet transform defines an orthonormal basis. In summary, both the matrices $P_{\Omega}^T P_{\Omega}$ and $W P_{\Omega}^T P_{\Omega} W^T$ will be diagonal with entries 1 in those coordinates selected by $P_{\Omega}$ and 0 otherwise. Hence, it's trivial to see that the maximum eigenvalue (and thus the spectral norm of these matrices) will be 1.
     \end{enumerate}
     \item 
     A parameter sweep over $\lambda_1$ and $\lambda_{\text{TV}}$ is depicted in Figure \ref{fig:lambda} against the Peak signal-to-noise ratio (PSNR) of the reconstructed image taking the original one as a reference. Each reconstruction has been obtained by running 200 iterations of FISTA. The higher the PSNR the better, and this can be seen in Figure \ref{fig:psnr_tv}.
     
-    \begin{figure}[ht]
+    \begin{figure}[H]
         \centering
         \includegraphics[trim={3cm 0.5cm 3cm 2cm},clip, width=.6\textwidth]{img/lambda_sweep.png}
         \caption{PSNR as a function of $\lambda$, the penalty parameter}
         \label{fig:lambda}
     \end{figure}
     
-    \begin{figure}[ht]
+    \begin{figure}[H]
         \centering
         \includegraphics[trim={3.5cm 2cm 3cm 2.8cm},clip,width=\textwidth]{img/psnr_l1.png}
         \includegraphics[trim={3.5cm 2cm 3cm 2.8cm},clip,width=\textwidth]{img/psnr_tv.png}
@@ -296,31 +296,45 @@ On the other hand, one can understand the Logistic Regression formulation as a o
         \label{fig:psnr_tv}
     \end{figure}
     \item
+    
+    \begin{table}[H]
+    \centering
+    \begin{tabular}{cc}
+        \toprule
+        $F^*$ & $F^\natural$\\
+        \midrule
+        28.18 & 5835.05 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison between Optimal value of the problem vs. Real value of the solution}
+    \label{tab:F_val}
+\end{table}
+    
     \item
     
     We can see the reconstruction obtained for both $\ell_1$ and TV regularization after 500 steps in Figure \ref{fig:rec_500}, where apart from the original image and the original with missing pixels, we can see an error map of the reconstruction. In Figure \ref{fig:rec_nn}, the same results but for the unrolled proximal operator can be seen. Note that comparing the regularized methods, TV regularization obtains a better result in terms of the PSNR, the SSIM and also the time. Nevertheless, when compared with the neural network, even if the SSIM is the same, this latter has a slightly larger PSNR and the time to obtain the reconstruction is much lower. Nevertheless, the time accounts for the inference and not for the computation of the unrolled proximal model.
     
-    \begin{figure}[ht]
+    \begin{figure}[H]
         \centering
-        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/reconstruction_l1.png}
-        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/reconstruction_tv.png}
+        \includegraphics[trim={.5cm .5cm 0cm 0cm},clip,width=\textwidth]{img/reconstruction_l1.png}
+        \includegraphics[trim={.5cm .5cm .5cm 0cm},clip,width=\textwidth]{img/reconstruction_tv.png}
         \caption{Reconstruction with $\ell_1$ and TV-regularization and 500 iterations}
         \label{fig:rec_500}
-    \end{figure}[ht]
+    \end{figure}[H]
     \begin{figure}
         \centering
-        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/reconstruction_nn.png}
+        \includegraphics[trim={.5cm .5cm .5cm 0cm},clip,width=\textwidth]{img/reconstruction_nn.png}
         \caption{Reconstruction using the trained unrolled proximal operator}
         \label{fig:rec_nn}
     \end{figure}
     
     For a fair comparison, Figure \ref{fig:5} show the results with only 5 iterations for the three methods considered before. Note that each iteration of the Neural Network costs roughly 200 times more that with the least squares problem formulation with either $\ell_1$ or TV regularization. These achieve very similar performance for only 5 iterations and are comparable with the trained unrolled proximal operator with 500 iterations, which still take less than half the time for five iterations of the Neural Network. Therefore, one would probably prefer TV regularization as the in-painting method.
     
-    \begin{figure}[ht]
+    \begin{figure}[H]
         \centering
-        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/l1_5.png}
-        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/tv_5.png}
-        \includegraphics[trim={3.5cm 2cm 3cm 2cm},clip,width=\textwidth]{img/nn_5.png}
+        \includegraphics[trim={4.5cm 3.5cm 2.5cm 0cm},clip,width=\textwidth]{img/l1_5.png}
+        \includegraphics[trim={.5cm .25cm .25cm 0cm},clip,width=\textwidth]{img/tv_5.png}
+        \includegraphics[trim={.5cm .25cm .25cm 0cm},clip,width=\textwidth]{img/nn_5.png}
         \caption{Reconstructions using 5 iterations}
         \label{fig:5}
     \end{figure}
