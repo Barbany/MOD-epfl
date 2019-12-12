@@ -75,10 +75,8 @@
     Finally, to show that $\Sigma_i$ is also PSD, note that $\Sigma_i = \Lambda - \mathbf{s}_i \mathbf{s}_i^T $ with $\mathbf{s}_i =[\sigma_{i1},\dots, \sigma_{iC}]^T$ and $\Lambda=\text{diag}(\mathbf{s}_i)$. By definition of positive semidefiniteness,
     \begin{align}
         \zz^T \Sigma_i \zz &= \zz^T (\Lambda - \mathbf{s}_i \mathbf{s}_i^T)\zz = \zz^T \Lambda \zz - \norm{\mathbf{s}_i^T \zz}^2 \\
-        &:= \sum_{j=1}^{C} z_j^2 \sigma_{ij} - \left(\sum_{j=1}^{C} z_j \sigma_{ij}\right)^2 \\
-        &\geq \sum_{j=1}^{C} z_j^2 \sigma_{ij} - \sum_{j=1}^{C} \left( z_j \sigma_{ij}\right)^2 &&\text{by convexity of $(\cdot)^2$}\\
-        &= \sum_{j=1}^{C} z_j^2 (\sigma_{ij} - \sigma_{ij}^2) \geq \sum_{j=1}^{C} z_j^2 &&\text{since $0\leq \sigma_{ij} \leq 1$}\\
-        &:= \norm{\zz} \geq 0 &&\text{by non-negativity of norm}
+        &:= \sum_{j=1}^{C} z_j^2 \sigma_{ij} - \sum_{j=1}^{C} \left(z_j \sigma_{ij}\right)^2 \\
+        &= \sum_{j=1}^{C} z_j^2 (\sigma_{ij} - \sigma_{ij}^2) \geq 0 &&\text{since $0\leq \sigma_{ij} \leq 1$}
     \end{align}
     
     The proof concludes by applying Fact \ref{fact1} to show that $\Sigma_i \otimes \aa_i \aa_i^T \succeq 0 \quad \forall i$ and by again applying \eqref{eq:sum_psd} $n$ times to show $\sum_i \Sigma_i + \aa_i \aa_i^T \succeq 0$.
@@ -149,13 +147,13 @@
     \begin{align}
        \frac{\partial}{\partial y_j} \left\lbrace \sum_{i=1}^d \lambda |y_i| + \frac{1}{2} (y_i-z_i)^2 \right\rbrace =  \lambda s + (y_j-z_j) = 0
     \end{align}
-    where $s \in \partial |y_j |$. We can distinguish, the following cases, where $s$ is taken to be 0 in the case $y_j=0$:
+    where $s \in \partial |y_j |$. We can distinguish, the following cases, where $s\in [-1,1]$ in the case $y_j=0$. Note that in such case, we have optimality when $0\in \lambda s- z_j$, which is equivalent to having $z_j \in [-\lambda, \lambda]$.
     \begin{align}
         y_j =
         \begin{cases}
             z_j - \lambda &\text{if $y_j>0$, so $z_j > \lambda$} \\
             z_j + \lambda &\text{if $y_j<0$, so $z_j < -\lambda$} \\
-            0 &\text{if }y_j=0
+            0 &\text{if $y_j=0$, so $z_j\in[-\lambda, \lambda]$}
         \end{cases}
     \end{align}
     which can be summarised as $y_j = \max{(|z_j|-\lambda, 0)}\text{sign}(z_j)$. Finally, we have
@@ -323,7 +321,7 @@ On the other hand, one can understand the Logistic Regression formulation as a o
         F(\boldsymbol{\alpha}^\natural) &:= \frac{1}{2}\norm{\bb - P_{\Omega} W^T \boldsymbol{\alpha}^\natural}^2_2 + \lambda_{\ell_1} \norm{\boldsymbol{\alpha}^\natural}_1 := \frac{1}{2}\norm{P_\Omega \xx^\natural - P_{\Omega} W^T W \xx^\natural}^2_2 + \lambda_{\ell_1} \norm{W \xx^\natural}_1 \\
         &= \lambda_{\ell_1} \norm{W \xx^\natural}_1 
     \end{align}
-    where the last inequality follows since the Wavelet transform defines an orthonormal basis, i.e. $W^T W= I$.
+    where the last equality follows since the Wavelet transform defines an orthonormal basis, i.e. $W^T W= I$.
     
     Note that for the ground-truth image, the term $f_{\ell_1}$ is zero, but the regularization term $g_{\ell_1}$ is not. Since we are minimizing the overall $F$, it is possible to obtain a lower objective value than the one with the ground-truth image. This explains the plot with increasing relative absolute error of Figure \ref{fig:f_nat}.
     
