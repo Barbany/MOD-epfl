@@ -108,7 +108,7 @@ def value_kmeans(points, labels):
     count = np.zeros([k,], int)
     
     for i in range(k):
-        count[i] = np.int8(np.sum(labels==(i)))
+        count[i] = np.int(np.sum(labels==(i)))
         
     idx = 0
     value = 0
