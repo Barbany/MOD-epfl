@@ -142,7 +142,21 @@
         v_k := \beta \nabla f(X_k) +A_1^T(A_1X_k -b_1)+A_2^T(A_2X_k-b_2)+(X_k - \Pi_\cK(X_k))
     \end{align}
     so the gradient found in \eqref{eq:grad} can be expressed as $\frac{v_k}{\beta}$.
-    \item The initial k-means value is 150.9680, and after running the algorithm it drops to 28.7269. The final objective value is below the optimal value (51.63 and 57.05 respectively), which is due to the problem relaxation. This latter includes all the feasible solutions of the original problem and thus its optimal solution, but also includes others that are not feasible on the original problem.
+    \item The initial k-means value is 150.9680, and after running the algorithm it drops to 28.7269. The solution is depicted in \autoref{fig:sdp}. The final objective value is below the optimal value (51.63 and 57.05 respectively), which is due to the problem relaxation. This latter includes all the feasible solutions of the original problem and thus its optimal solution, but also includes others that are not feasible on the original problem. This explains why the relative error slightly increases in the final iterations, even though it's hard to see in \autoref{fig:resid}.
 \end{enumerate}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=.5\textwidth]{4-frank_wolfe/part3/residual.png}
+    \caption{Evolution of relative objective residual with $f^*$ the optimal value of the original problem.}
+    \label{fig:resid}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=.5\textwidth]{4-frank_wolfe/part3/sdp.png}
+    \caption{Final SDP solution to the relaxation of $k-$means clustering.}
+    \label{fig:sdp}
+\end{figure}
 
 \end{document}
