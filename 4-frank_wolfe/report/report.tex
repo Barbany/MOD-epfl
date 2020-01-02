@@ -1,0 +1,148 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\input{preamble.tex}
+
+\begin{document}
+
+\homework{Mathematics of Data}{Fall 2019}{4}{5\textsuperscript{th} January 2020}{Oriol Barbany Mayor}
+
+\section{Projection-free convex low-rank matrix optimization}
+\problem{Projection onto the nuclear norm ball}
+\begin{enumerate}[label=(\alph*)]
+    \item The projection of $Z$ onto $\cX$ is given by
+    \begin{align}
+        \Pi_{\cX}(Z)=\argmin_{X\in \cX}\norm{X-Z}_F
+        \label{eq:prob}
+    \end{align}
+    
+    Using Mirsky's inequality and the definition of Frobenius norm, it follows that
+    \begin{align}
+        \norm{X-Z}_F &\geq \norm{\Sigma_X - \Sigma_Z}_F := \sqrt{\sum_{i=1}^s\sum_{j=1}^s |\Sigma_X(i,j) - \Sigma_Z(i,j)|^2}\\
+        &=\sqrt{\sum_{i=1}^s|\sigma_X(i) - \sigma_Z(i)|^2}=:\norm{\sigma_X - \sigma_Z}_2
+    \end{align}
+    where $\Sigma_X,\Sigma_Z\in \R^{s\times s}$ are the diagonal matrices of the singular values of $X,Z$ respectively.
+    
+    Using the latter, we have that
+    \begin{align}
+        \min_{X\in \cX}\norm{X-Z}_F \geq \min_{\Sigma_X\in \cX}\norm{\Sigma_X - \Sigma_Z}_F = \min_{\norm{\sigma_X}_1 \leq \kappa}\norm{\sigma_X - \sigma_Z}_2
+        \label{eq:ineq}
+    \end{align}
+    so we can equivalently minimize the left hand side and obtain a solution for \eqref{eq:prob}. This latter has a minimum attained at $\sigma_X = \sigma_Z^{\ell_1}$, the projection of $\sigma_Z$ onto the $\ell_1-$norm ball of radius $\kappa$. This means that $\Sigma_Z^{\ell_1}:=\text{diag}(\sigma_Z^{\ell_1})$ minimizes the equivalent matrix version. Finally, using \eqref{eq:ineq} we have that
+    \begin{align}
+        \Pi_{\cX}(Z)=U\Sigma_Z^{\ell_1} V^T
+    \end{align}
+    
+    \item After performing 10 runs, the projection took 1.452$\pm$0.129 and 77.376$\pm$3.188 seconds for the 1K and 1M MovieLens datasets respectively.
+\end{enumerate}
+\problem{LMO of nuclear norm}
+\begin{enumerate}[label=(\alph*)]
+    \item Let $Z=U\Sigma V^T$ be the singular value decomposition of $Z$ with $\sigma_{\max}$ its singular value and $\uu$ and $\vv$ the associated left and right singular vectors respectively. Since the matrices $U$ and $V$ are unitary,
+    \begin{align}
+         \lin{-\kappa \uu\vv^T, Z} &= Tr(-\kappa Z^T\uu\vv^T)= -\kappa Tr(V\Sigma U^T \uu\vv^T)= -\kappa \sigma_{\max} Tr(\vv \vv^T) = -\kappa  \sigma_{\max} Tr(\vv^T \vv) \\
+         &= -\kappa \sigma_{\max} = -\kappa \norm{Z} \leq -\norm{X}_* \norm{Z} \leq -|\lin{X, Z}|\leq \lin{X, Z}
+         \label{eq:lmo}
+    \end{align}
+    where the penultimate step holds by Hölder's inequality since the spectral norm is the dual of the nuclear norm. Given that $-\kappa \uu\vv^T \in \cX$, it follows that $-\kappa \uu\vv^T\in \text{lmo}_{\cX}(Z)$.
+    
+    \item After performing 10 runs, the projection took 0.029$\pm$0.005 and 0.294$\pm$0.008 seconds for the 1K and 1M MovieLens datasets respectively.
+\end{enumerate}
+
+\section{Crime Scene Investigation with Blind Deconvolution}
+\begin{enumerate}[label=(\alph*)]
+    \item
+    \begin{lemma}
+        For every linear operator $A:V\to W$, where $V$ and $W$ are finite-dimensional vector spaces, $A$ can be expressed as a matrix.
+        \label{lemma:1}
+    \end{lemma}
+    \begin{proof}
+        Let $\cB_V=\{\ee_1,\dots,\ee_n\}$ and $\cB_W=\{\ff_1,\dots,\ff_m\}$ be a basis of $V$ and $W$ respectively. By linearity of $A$, we know that
+        \begin{align}
+            A(c_1 \ee_1 + \cdots, c_n \ee_n) = c_1A(\ee_1) + \cdots + c_n A(\ee_n)
+        \end{align}
+        and thus the output of any vector $\xx \in V$ is fully determined by its decomposition in $\cB_V$ and $\{A(\ee_i)\}_{i=1}^n$. Moreover, since $A(\ee_i)\in W \ \forall i\in\{1,\dots,n\}$, it can be represented as a linear combination of basis vectors in $\cB_W$, i.e.
+        \begin{align}
+            T(\ee_i)=a_{i,1}\ff_1+\cdots+ a_{i,m}\ff_m
+        \end{align}
+        which means that the operator $A$ can be implemented as a $M\times N$ matrix.
+    \end{proof}
+    
+    Using \autoref{lemma:1} and with a slight abuse of notation naming $A(X)=AX$ as the linear operator expressed as a matrix multiplication, we have that
+    \begin{align}
+        \nabla f(X) = A^T (AX - b)
+    \end{align}
+    
+    Let $L$ be the Lipschitz constant of $\nabla f$.
+    \begin{align}
+        \norm{\nabla f(X) - \nabla f(X)} &= \norm{A^T (AX - b) - A^T (AY - b)}=\norm{A^TA(X - Y)} \\
+        &\leq \norm{A^T A} \norm{X-Y} =: L \norm{X-Y}
+    \end{align}
+    where the inequality follows from the definition of the spectral norm.
+    \item  The result with $\kappa=100$ and kernel support $K_1=K_2=17$ is depicted in \autoref{fig:deconv}, where one can easily read the plate with number J209LTL.
+\end{enumerate}
+
+\begin{figure}[ht]
+    \centering
+    \begin{minipage}{.45\textwidth}
+        \includegraphics[width=\textwidth]{4-frank_wolfe/part2/blurredplate.jpg}
+    \end{minipage}
+    \begin{minipage}{.45\textwidth}
+        \includegraphics[width=\textwidth]{4-frank_wolfe/part2/reconstruction.jpg}
+    \end{minipage}
+    \caption{Blurred license plate (left) and result of the blind deconvolution (right).}
+    \label{fig:deconv}
+\end{figure}
+
+\section{K-Means Clustering by Semidefinite Programming}
+\problem{Conditional gradient method for clustering}
+\begin{enumerate}[label=(\alph*)]
+    \item
+    Let $X, Y \in \cX$ any two matrices and $\alpha \in [0,1]$. Then, we have that $\alpha X + (1-\alpha)Y \in \cX$ and thus the set $\cX$ is convex iff $Tr(\alpha X + (1-\alpha)Y)\leq \kappa$ and $\alpha X + (1-\alpha)Y \succeq 0$.
+    
+    Given that the trace is a linear operator,
+    \begin{align}
+        Tr(\alpha X + (1-\alpha)Y) = \alpha Tr(X) + (1-\alpha)Tr(Y) \leq \alpha \kappa + (1-\alpha) \kappa = \kappa
+    \end{align}
+    where the inequality holds since $Tr(X),Tr(Y)\leq \kappa$.
+    
+    By definition of positive semidefiniteness,
+    \begin{align}
+        \alpha X + (1-\alpha)Y \succeq 0 \Longleftrightarrow \xx^T(\alpha X + (1-\alpha)Y) \xx \geq 0\qquad \forall \xx\in \R^p
+    \end{align}
+    
+    Since $X,Y\succeq 0$,
+    \begin{align}
+        \xx^T(\alpha X + (1-\alpha)Y) \xx = \alpha \xx^T X \xx + (1-\alpha)\xx^T Y\xx  \geq 0
+    \end{align}
+    which concludes the proof.
+    
+    \item SDP relaxation can be formulated as
+    \begin{align}
+        \min_{X\in \cX} f(X) + g_1(A_1(X))+g_2(A_2(X)) \quad \text{ subject to }X\in \cK
+    \end{align}
+    where $g_1$ and $g_2$ are the indicator functions of singletons $\{b_1\}$ and $\{b_2\}$ respectively. Writing this constraints in the quadratic penalty form yields:
+    \begin{align}
+        g_1(A_1(X)) &\longrightarrow \text{QP}_{\{b_1\}}(X)=\min_{Y\in \{b_1\}}\norm{Y-A_1(X)}^2=\norm{b_1-A_1(X)}^2 \\
+        g_2(A_2(X)) &\longrightarrow \text{QP}_{\{b_2\}}(X)=\min_{Y\in \{b_2\}}\norm{Y-A_2(X)}^2=\norm{b_2-A_2(X)}^2 \\
+        X\in \cK &\longrightarrow \text{QP}_{\cK}(X)=\text{dist}^2(X,\cK)=\norm{\Pi_\cK(X) - X}^2
+    \end{align}
+    where $\Pi_\cK(X) = \argmin_{Y\in \cK}\norm{Y-X}$ is the projection of $X$ onto $\cK$.
+    
+    The penalized objective with penalization parameter $\frac{1}{2\beta}$ takes the form
+    \begin{align}
+        f(X)+\frac{1}{2\beta}\norm{b_1-A_1(X)}^2+\frac{1}{2\beta}\norm{b_2-A_2(X)}^2+\frac{1}{2\beta}\text{dist}^2(X,\cK)
+    \end{align}
+    which has a gradient of
+    \begin{align}
+        \nabla f(X) +\frac{1}{\beta}A_1^T(A_1X -b_1)+\frac{1}{\beta}A_2^T(A_2X-b_2)+\frac{1}{\beta}(X - \Pi_\cK(X))
+        \label{eq:grad}
+    \end{align}
+    where I used \autoref{lemma:1} to express the linear operators $A_1,A_2$ as a matrix and Danskin's theorem to derivative as if $\Pi_\cK(X)$ was not a function of $X$.
+    \item Following the proposed notation,
+    \begin{align}
+        v_k := \beta \nabla f(X_k) +A_1^T(A_1X_k -b_1)+A_2^T(A_2X_k-b_2)+(X_k - \Pi_\cK(X_k))
+    \end{align}
+    so the gradient found in \eqref{eq:grad} can be expressed as $\frac{v_k}{\beta}$.
+    \item The initial k-means value is 150.9680, and after running the algorithm it drops to 28.7269. The final objective value is below the optimal value (51.63 and 57.05 respectively), which is due to the problem relaxation. This latter includes all the feasible solutions of the original problem and thus its optimal solution, but also includes others that are not feasible on the original problem.
+\end{enumerate}
+
+\end{document}
