@@ -1,0 +1,235 @@
+\usepackage[utf8]{inputenc}
+
+\usepackage[top=2cm, bottom=3.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[T1]{fontenc}
+\usepackage{float}
+
+\usepackage{graphicx}
+\usepackage{epstopdf}
+
+%
+% The following macro is used to generate the header.
+% Arguments are
+% Course, Semester+Year, Homework number, Due Date, Student
+%
+\newcommand{\homework}[5]{
+   \thispagestyle{plain}
+   \newpage
+   \noindent
+   \begin{center}
+   \framebox{
+      \vbox{\vspace{2mm}
+    \hbox to 6.28in { {\bf #1 \hfill #2} }
+       \vspace{6mm}
+       \hbox to 6.28in { {\Large \hfill Homework \##3 - Due date: #4\hfill} }
+       \vspace{4mm}
+       \hbox to 6.28in { {\hfill Student: #5} }
+      \vspace{2mm}}
+   }
+   \end{center}
+}
+
+% Style of Greek letters
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}
+
+\usepackage{titlesec}
+\renewcommand{\thesection}{\Roman{section}}
+\titleformat{\section}
+  {\mdseries\scshape\Large}{\Large{\mdseries\scshape Part }\thesection\ -\ }{0pt}{}
+\titleformat{\subsection}
+  {\mdseries\scshape\large}{\large{\mdseries\scshape Problem }\thesubsection\ -\ }{0pt}{}
+\newcommand{\problem}{\subsection}
+
+%%%%%%%%%%%%%%%%%%%%%% Macros EPFL-MLO %%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amssymb,amsmath,amsthm,dsfont}
+
+% Indicator function
+\usepackage{bbm}
+\providecommand{\ind}[1]{\mathbbm{1}_{\{#1\}}}
+
+\providecommand{\lin}[1]{\ensuremath{\left\langle #1 \right\rangle}}
+\providecommand{\abs}[1]{\ensuremath{\left\lvert#1\right\rvert}}
+\providecommand{\norm}[1]{\ensuremath{\left\lVert#1\right\rVert}}
+
+\providecommand{\refLE}[1]{\ensuremath{\stackrel{(\ref{#1})}{\leq}}}
+\providecommand{\refEQ}[1]{\ensuremath{\stackrel{(\ref{#1})}{=}}}
+\providecommand{\refGE}[1]{\ensuremath{\stackrel{(\ref{#1})}{\geq}}}
+\providecommand{\refID}[1]{\ensuremath{\stackrel{(\ref{#1})}{\equiv}}}
+
+  % basic sets
+  \providecommand{\R}{\mathbb{R}} % Reals
+  \providecommand{\N}{\mathbb{N}} % Naturals
+  
+  % random variables
+  \DeclareMathOperator{\E}{{\mathbb E}}
+  %\providecommand{\E}[1]{{\mathbb E}\left.#1\right. }     %expectation
+  \providecommand{\Eb}[1]{\ensuremath{\E \left[#1\right] }} %expectation, with brackets
+  \providecommand{\EE}[2]{\E_{#1} \! #2 }      %expectation  
+  \providecommand{\EEb}[2]{\ensuremath{\E_{#1}\!\! \left[#2\right] }} %expectation,  with brackets
+  \providecommand{\prob}[1]{\ensuremath{{\rm Pr}\left[#1\right] } }
+  \providecommand{\Prob}[2]{\ensuremath{{\rm Pr}_{#1}\left[#2\right] } }
+  \providecommand{\P}[1]{\ensuremath{{\rm Pr}\left.#1\right. }}
+  \providecommand{\Pb}[1]{\ensuremath{{\rm Pr}\left[#1\right] }}
+  \providecommand{\PP}[2]{\ensuremath{{\rm Pr}_{#1}\left[#2\right] }}
+  \providecommand{\PPb}[2]{\ensuremath{{\rm Pr}_{#1}\left[#2\right] }}
+  
+  \newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+  \def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+
+  % operators
+  \DeclareMathOperator*{\argmin}{arg\,min}
+  \DeclareMathOperator*{\argmax}{arg\,max}
+  \DeclareMathOperator*{\supp}{supp}
+  \DeclareMathOperator*{\diag}{diag}
+  \DeclareMathOperator*{\Tr}{Tr}
+  
+  % bold vectors
+  \providecommand{\0}{\mathbf{0}}
+  \providecommand{\1}{\mathbf{1}}
+  \renewcommand{\aa}{\mathbf{a}}
+  \providecommand{\bb}{\mathbf{b}}
+  \providecommand{\cc}{\mathbf{c}}
+  \providecommand{\dd}{\mathbf{d}}
+  \providecommand{\ee}{\mathbf{e}}
+  \providecommand{\ff}{\mathbf{f}}
+  \let\ggg\gg
+  \renewcommand{\gg}{\mathbf{g}}
+  \providecommand{\gv}{\mathbf{g}}
+  \providecommand{\hh}{\mathbf{h}}
+  \providecommand{\ii}{\mathbf{i}}
+  \providecommand{\jj}{\mathbf{j}}
+  \providecommand{\kk}{\mathbf{k}}
+  \let\lll\ll
+  \renewcommand{\ll}{\mathbf{l}}
+  \providecommand{\mm}{\mathbf{m}}
+  \providecommand{\nn}{\mathbf{n}}
+  \providecommand{\oo}{\mathbf{o}}
+  \providecommand{\pp}{\mathbf{p}}
+  \providecommand{\qq}{\mathbf{q}}
+  \providecommand{\rr}{\mathbf{r}}
+  \renewcommand{\ss}{\mathbf{s}}
+  \providecommand{\tt}{\mathbf{t}}
+  \providecommand{\uu}{\mathbf{u}}
+  \providecommand{\vv}{\mathbf{v}}
+  \providecommand{\ww}{\mathbf{w}}
+  \providecommand{\xx}{\mathbf{x}}
+  \providecommand{\yy}{\mathbf{y}}
+  \providecommand{\zz}{\mathbf{z}}
+  
+  % bold matrices
+  \providecommand{\mA}{\mathbf{A}}
+  \providecommand{\mB}{\mathbf{B}}
+  \providecommand{\mC}{\mathbf{C}}
+  \providecommand{\mD}{\mathbf{D}}
+  \providecommand{\mE}{\mathbf{E}}
+  \providecommand{\mF}{\mathbf{F}}
+  \providecommand{\mG}{\mathbf{G}}
+  \providecommand{\mH}{\mathbf{H}}
+  \providecommand{\mI}{\mathbf{I}}
+  \providecommand{\mJ}{\mathbf{J}}
+  \providecommand{\mK}{\mathbf{K}}
+  \providecommand{\mL}{\mathbf{L}}
+  \providecommand{\mM}{\mathbf{M}}
+  \providecommand{\mN}{\mathbf{N}}
+  \providecommand{\mO}{\mathbf{O}}
+  \providecommand{\mP}{\mathbf{P}}
+  \providecommand{\mQ}{\mathbf{Q}}
+  \providecommand{\mR}{\mathbf{R}}
+  \providecommand{\mS}{\mathbf{S}}
+  \providecommand{\mT}{\mathbf{T}}
+  \providecommand{\mU}{\mathbf{U}}
+  \providecommand{\mV}{\mathbf{V}}
+  \providecommand{\mW}{\mathbf{W}}
+  \providecommand{\mX}{\mathbf{X}}
+  \providecommand{\mY}{\mathbf{Y}}
+  \providecommand{\mZ}{\mathbf{Z}}
+  \providecommand{\mLambda}{\mathbf{\Lambda}}
+  
+  % caligraphic
+  \providecommand{\cA}{\mathcal{A}}
+  \providecommand{\cB}{\mathcal{B}}
+  \providecommand{\cC}{\mathcal{C}}
+  \providecommand{\cD}{\mathcal{D}}
+  \providecommand{\cE}{\mathcal{E}}
+  \providecommand{\cF}{\mathcal{F}}
+  \providecommand{\cG}{\mathcal{G}}
+  \providecommand{\cH}{\mathcal{H}}
+  \providecommand{\cI}{\mathcal{I}}
+  \providecommand{\cJ}{\mathcal{J}}
+  \providecommand{\cK}{\mathcal{K}}
+  \providecommand{\cL}{\mathcal{L}}
+  \providecommand{\cM}{\mathcal{M}}
+  \providecommand{\cN}{\mathcal{N}}
+  \providecommand{\cO}{\mathcal{O}}
+  \providecommand{\cP}{\mathcal{P}}
+  \providecommand{\cQ}{\mathcal{Q}}
+  \providecommand{\cR}{\mathcal{R}}
+  \providecommand{\cS}{\mathcal{S}}
+  \providecommand{\cT}{\mathcal{T}}
+  \providecommand{\cU}{\mathcal{U}}
+  \providecommand{\cV}{\mathcal{V}}
+  \providecommand{\cX}{\mathcal{X}}
+  \providecommand{\cY}{\mathcal{Y}}
+  \providecommand{\cW}{\mathcal{W}}
+  \providecommand{\cZ}{\mathcal{Z}}
+
+% Commenting
+\RequirePackage[colorinlistoftodos,bordercolor=orange,backgroundcolor=orange!20,linecolor=orange,textsize=scriptsize]{todonotes}
+\providecommand{\comment}[2]{\todo[inline,caption={}]{\textbf{#1: }#2}}%
+\providecommand{\inlinecomment}[3]{%
+  %\@getnewcolor%
+  %\edef\@tempa{\@colstring}%
+  {\color{#1}#2: #3}}%
+\newcommand\commenter[2]%
+{%
+  \expandafter\newcommand\csname i#1\endcsname[1]{\inlinecomment{#2}{#1}{##1}}
+  \expandafter\newcommand\csname #1\endcsname[1]{\comment{#1}{##1}}
+}
+
+% Use these for theorems, lemmas, proofs, etc.
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}[lemma]{Corollary}
+%\newtheorem{conjecture}[lemma]{Conjecture}
+\newtheorem{definition}{Definition}
+\newtheorem{remark}[lemma]{Remark}
+\newtheorem{assumption}{Assumption}
+\newtheorem{theorem}[lemma]{Theorem}
+\newtheorem{example}[lemma]{Example}
+
+\newtheorem{claim}{Claim}
+\newtheorem{fact}{Fact}
+
+\newcommand{\propositionautorefname}{Proposition}
+\newcommand{\lemmaautorefname}{Lemma}
+\newcommand{\corollaryautorefname}{Corollary}
+\newcommand{\definitionautorefname}{Definition}
+\newcommand{\remarkautorefname}{Remark}
+\newcommand{\assumptionautorefname}{Assumption}
+\newcommand{\theoremautorefname}{Theorem}
+\newcommand{\exampleautorefname}{Example}
+\newcommand{\claimautorefname}{Claim}
+\newcommand{\factautorefname}{Fact}
+
+\definecolor{mydarkblue}{rgb}{0,0.08,0.45}
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref} 
+\hypersetup{ %
+    colorlinks=true,
+    linkcolor=mydarkblue,
+    citecolor=mydarkblue,
+    filecolor=mydarkblue,
+    urlcolor=mydarkblue
+}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+
+\usepackage{url}
+\def\UrlBreaks{\do\/\do-}
+
+\usepackage[round]{natbib}
+\renewcommand{\cite}[1]{\citep{#1}}
+
