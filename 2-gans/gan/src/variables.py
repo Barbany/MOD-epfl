@@ -30,5 +30,6 @@ class LinearDualVariable(nn.Module):
     def enforce_lipschitz(self):
         """Enforce the 1-Lipschitz condition of the function"""
         # Normalize vector
-        self.v.data = self.v.data / torch.norm(self.v.data)
+        if torch.norm(self.v.data) > 1:
+            self.v.data = self.v.data / torch.norm(self.v.data)
 
